@@ -1,0 +1,4 @@
+[submodule "thinkphp"]
+	path = thinkphp
+	url = https://github.com/top-think/framework.git
+	branch = 5.0

@@ -4,7 +4,7 @@ namespace app\agent\controller;
 
 use app\common\controller\Backend;
 use think\Db;
-use app\common\model\AgentInvite;
+use app\common\model\AgentInvite as AgentInviteModel;
 
 /**
  * 邀请码管理（代理后台）
@@ -16,7 +16,7 @@ class AgentInvite extends Backend
     public function _initialize()
     {
         parent::_initialize();
-        $this->model = new AgentInvite();
+        $this->model = new AgentInviteModel();
     }
 
     /**

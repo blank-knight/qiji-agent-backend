@@ -3,7 +3,7 @@
 namespace app\admin\controller;
 
 use app\common\controller\Backend;
-use app\common\model\Version;
+use app\common\model\Version as VersionModel;
 
 /**
  * 版本管理
@@ -15,6 +15,6 @@ class Version extends Backend
     public function _initialize()
     {
         parent::_initialize();
-        $this->model = new Version();
+        $this->model = new VersionModel();
     }
 }
