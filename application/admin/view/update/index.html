@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="__CDN__/user_assets/layui/css/layui.css?v={$Think.config.site.version}" rel="stylesheet">
+
+    <title>更新系统</title>
+    <style>
+        html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,time,mark,audio,video{margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline;box-sizing:border-box}
+        article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}
+        body{line-height:1;background: #fff}
+        ol,ul{list-style:none}
+        blockquote,q{quotes:none}
+        blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}
+        table{border-collapse:collapse;border-spacing:0}
+        .upDateList_content{display:flex;padding:0 30px;background:#fff}
+        .upDateList_time_container{display:flex;align-items:center;justify-content:center;flex-direction:column;padding:30px 20px 30px 0;border-right:3px solid #a5b2ff;position:relative}
+        .upDateList_main_container{flex:1;padding:30px 0}
+        .upDateList_time_container b{font-size:24px;margin-bottom:5px;color:#334bdb;font-weight:normal}
+        .upDateList_time_container span{font-size:14px;color:#334bdb}
+        .circular_container{width:12px;height:12px;z-index:101;background-color:#6177ff;border-radius:50%;position:absolute;right:-7px}
+        .upDateList_main_content{position:relative;border:1px solid #dbd1ff;margin-left:25px;border-radius:5px}
+        .upDateList_mainHeader_container{display:flex;align-items:center;justify-content:space-between;box-sizing:border-box;height:50px;padding:0 20px;font-size:20px;line-height:50px;background:linear-gradient(220deg,#a5b2ff,#5263c7);color:#fff;border-radius: 10px}
+        .upDateList_mainInfo_container{padding: 20px;text-align:left;font-size:14px;color:#4d4d4d;line-height:30px}
+        .upDateList_mainHeader_container h3{font-size:20px;color:#fff}
+        .upDateList_mainHeader_container span{color:#6d1bc4;font-size:14px}
+
+        .update_btn{width: 150px;line-height: 40px;border-radius: 10px;text-align: center;color: #fff;font-size: 16px;background: linear-gradient(168deg,#2f48e2,#a63cb6);margin: 10px 30px;cursor: pointer;display: inline-block;}
+        .now_version_span{color: #6136fd}
+    </style>
+</head>
+<body>
+    <div >
+        <span class="update_btn">在线更新</span>
+        <span class="now_version_span">当前版本：V <span class="now_version">{$now_version}</span></span>
+        <p style="margin-top: 10px;color: #ff5d4b;font-size: 14px;margin-left: 30px;margin-bottom: 10px;">注意：{$tips}</p>
+    </div>
+    <div class="upDateList_container">
+        {foreach $versions as $k=>$v}
+        <div class="upDateList_content">
+            <div class="upDateList_time_container">
+                <b>{$v['day']}</b>
+                <span>{$v['date']}</span>
+                <div class="circular_container"></div>
+            </div>
+            <div class="upDateList_main_container">
+                <div class="upDateList_main_content">
+                    <div class="upDateList_mainHeader_container">
+                        <h3>版本号：V {$v['newversion']}</h3>
+                    </div>
+                    <div class="upDateList_mainInfo_container">
+                        {$v['content']}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {/foreach}
+  </div>
+  <input type="hidden" name="" class="is_update" value="{$is_update}">
+</body>
+<script src="__CDN__/user_assets/layui/jquery-3.7.1.js?v={$Think.config.site.version}"></script>
+<script src="__CDN__/user_assets/layui/layui.js?v={$Think.config.site.version}"></script>
+<script type="text/javascript">
+    $('.update_btn').click(function(){
+        if($('.is_update').val()!=1){
+            layer.msg('已经是最新版了，无需更新');return;
+        }else{
+            // 开始更新
+            layer.confirm('更新后不可恢复，如您有二次开发过，请咨询开发者后谨慎更新，确定现在更新？', {icon: 3, title:'温馨提示',shade: 0.7,closeBtn: 2,  anim: 1}, function(index){
+                load_index = layer.load();
+                $.post('update/update_qy',{},function(data){
+                    
+                    if(data.code==1){
+                        if(data.data==1){
+                            // 二开的时候
+                            $.post('update/update_qy_dev',{},function(data){
+                                layer.close(load_index);
+                                layer.msg(data.msg);
+                                setTimeout(function(){
+                                    layer.close(index);
+                                    window.location.reload(); // 直接当前页面刷新
+                                },1000)
+                            });
+                            
+                        }else{
+                            layer.close(load_index);
+                            layer.msg(data.msg);
+                            setTimeout(function(){
+                                layer.close(index);
+                                window.location.reload(); // 直接当前页面刷新
+                            },1000)
+                        }
+                        
+                    }else{
+                        layer.close(load_index);
+                        layer.msg(data.msg);
+                    }
+                },"json");
+                
+            });
+        }
+    });
+</script>
+</html>

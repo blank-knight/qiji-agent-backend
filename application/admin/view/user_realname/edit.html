@@ -1,0 +1,87 @@
+
+
+<form id="add-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+    {:token()}
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">企业名称:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-realname" class="form-control" name="row[realname]"  type="text" placeholder="企业名称" value="{$row.realname}" >
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">证件号:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-number" class="form-control" name="row[number]"  type="text" placeholder="证件号" value="{$row.number}" >
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">执照:</label>
+        <div class="col-xs-12 col-sm-8">
+            <div class="input-group">
+                <input id="c-yz_image"  class="form-control" size="50" name="" type="text" value="{$row['yz_image']}">
+                <div class="input-group-addon no-border no-padding">
+                    <span><button type="button" id="faupload-yz_image" class="btn btn-danger faupload" data-input-id="c-yz_image" data-mimetype="image/jpeg,image/png,image/gif" data-preview-id="p-yz_image"><i class="fa fa-upload"></i> 上传</button></span>
+                </div>
+                <span class="msg-box n-right" for="c-yz_image"></span>
+            </div>
+            <ul class="row list-inline faupload-preview" id="p-yz_image"></ul>
+        </div>
+    </div>
+ 
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">管理员:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-username" class="form-control" name="row[username]"  type="text" placeholder="管理员" value="{$row.username}" >
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">身份证号:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-idcard" class="form-control" name="row[idcard]"  type="text" placeholder="身份证号" value="{$row.idcard}" >
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">管理员身份证人像面:</label>
+        <div class="col-xs-12 col-sm-8">
+            <div class="input-group">
+                <input id="c-user_image"  class="form-control" size="50" name="" type="text" value="{$row['user_image']}">
+                <div class="input-group-addon no-border no-padding">
+                    <span><button type="button" id="faupload-user_image" class="btn btn-danger faupload" data-input-id="c-user_image" data-mimetype="image/jpeg,image/png,image/gif" data-preview-id="p-user_image"><i class="fa fa-upload"></i> 上传</button></span>
+                </div>
+                <span class="msg-box n-right" for="c-user_image"></span>
+            </div>
+            <ul class="row list-inline faupload-preview" id="p-user_image"></ul>
+        </div>
+    </div>
+
+
+
+    <div class="form-group mode2_block"  >
+        <label class="control-label col-xs-12 col-sm-2">审核状态:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_radios('row[status]', ['0'=>'待审核','1'=>'认证通过','2'=>'审核失败'],$row['status'])}
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">失败备注:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-remark" class="form-control" name="row[remark]"  type="text" placeholder="失败备注" value="{$row.remark}" >
+        </div>
+    </div>
+
+
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-primary btn-embossed disabled">{:__('OK')}</button>
+            <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+        </div>
+    </div>
+</form>
+
+<script src="__CDN__/user_assets/layui/jquery-3.7.1.js?v={$Think.config.site.version}"></script>
+
+

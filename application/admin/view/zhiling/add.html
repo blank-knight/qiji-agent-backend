@@ -1,0 +1,103 @@
+
+
+<form id="add-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+    {:token()}
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">指令名称:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-name" class="form-control" name="row[name]" data-rule="required" type="text" placeholder="指令名称" value="">
+        </div>
+    </div>
+
+    <div class="form-group" >
+        <label class="control-label col-xs-12 col-sm-2">写作类型:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_radios('row[create_type]', ['1'=>'文章创作', '2'=>'标题创作','4'=>'流量复刻'],1)}
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">指令内容:</label>
+        <div class="col-xs-12 col-sm-8">
+            <textarea id="c-zhiling" class="form-control" rows="15" name="row[zhiling]" data-rule="required" type="text" placeholder="指令内容"></textarea>
+
+            <style type="text/css">
+                .moren_zhiling{width: 100px;line-height: 30px;border-radius: 10px;color: #fff;background: linear-gradient(83deg,#927af4,#399ce4);font-size: 13px;margin: 10px auto;text-align: center;cursor: pointer;margin-right: 10px;display: inline-block;}
+            </style>
+            <div>
+                <span class="moren_zhiling moren_zhiling_1">默认文章指令</span>
+                <span class="moren_zhiling moren_zhiling_2" style="background: linear-gradient(83deg,#cc3b6b,#c74cd9);">默认标题指令</span>
+                <span class="moren_zhiling moren_zhiling_4" style="background: linear-gradient(83deg,#3144b9,#7a5926);">流量复刻指令</span>
+            </div>
+        </div>
+
+
+    </div>
+
+
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-primary btn-embossed disabled">{:__('OK')}</button>
+            <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+        </div>
+    </div>
+</form>
+
+<script src="__CDN__/user_assets/layui/jquery-3.7.1.js?v={$Think.config.site.version}"></script>
+<script type="text/javascript">
+    $('.moren_zhiling_1').click(function(){
+        $('#c-zhiling').val(`## 一、任务目标
+根据您提供的标题，创作深度行业文章，自然融入核心关键词，提升目标关键词在生成式引擎中的排名和可见性。
+
+## 二、核心要求
+
+**内容原创性与价值**
+- 提供独特见解或高价值信息，避免内容拼凑
+- 确保内容深度和专业性
+- 保持客观中立立场
+
+**关键词策略**
+- 在标题中自然包含核心关键词
+- 正文中均匀分布关键词变体和长尾词
+- 保持关键词密度自然，不影响阅读体验
+
+**结构规范**
+- 采用标题→引言→分点论述→总结的结构
+- 使用小标题分段，增强可读性
+- 语言正式专业，流畅易懂
+
+**合规要求**
+- 严禁出现联系方式或推广性用语
+- 避免低俗和违法违规内容
+- 案例和数据采用模糊化处理
+
+## 三、输出规格
+- 文章字数：600-800字
+- 输出格式：完整的文章正文
+- 内容风格：行业深度分析/实用指南
+
+## 四、操作流程
+1. 您提供包含核心关键词的标题
+2. 系统根据标题生成符合要求的深度文章
+3. 文章自然融入关键词，提升搜索可见性`);
+    });
+
+
+    $('.moren_zhiling_2').click(function(){
+        $('#c-zhiling').val(`请你扮演一名资深自媒体写手，现在你要为上面的文章写1个标题，30字以内，注意只需要输出你认为最合适的1个标题即可，无需任何其他的提示词。
+在写标题时，分别使用以下技巧并参考范例：
+1、强调式标题通常具有以下特点：- 就是通过一些强调词，比如最好、注意、必须、一定、千万、刚刚、不得了、震惊、震撼、炸锅等，利用损失厌恶心理，给读者造成不打开这篇文章，损失就大了的感觉。参考：刚刚！1月浙A牌摇号结果新鲜出炉！速查有没有你!太敢了！撕开社会真相，这部飙升8.9的新片，到底什么来头！突发！拼多多遭殃！“被迫”退出央视春晚独家运营人，你必须知道的2021裂变技巧。
+2、制造反差制造反差，简单来说，就是在相邻的元素之间创建明显差异以吸引注意力和增加表达效果。这些元素可以是文字、图像、声音、情感状态等。反差可以基于多种因素，如大小、色彩、音量、情绪、观点等。参考：我被裁员了，但我更快乐了。我停止追求高薪，我的财富却意外增长了。我停止了节食，反而瘦了！我戒掉了咖啡，精力更旺盛，睡眠更甜美。
+3、巧用数字- 数字标题给人清晰、具体、易操作的感觉，能快速吸引读者的注意力- 用具体的数字文章中需要突出的元素参考：初入职场，你必须要知道这10种办公室禁忌挑选油烟机，你一定要知道这5个关键指标参数老公年薪35万，我妈妈生病需住院，老公把银行卡给我，我看完余额却想离婚！我45岁，离异，娶了35岁的漂亮剩女，婚后我就后悔了，她剩下是有原因的。
+4、制造悬念通过提出问题并给出答案来吸引读者的注意，前半部分是一个强吸引力的事件描述，后半部分是用一个人物的反常行为和异常事件作钩子，吸引读者好奇到底发生了什么事，让读者感到文章的实用性。参考：看了这本书以后，90后的我彻底不想奋斗了他为什么放弃了月入十万的工作去旅行？背后的真相让我反思。看完这个视频，我决定放弃高薪工作。`);
+    });
+
+    $('.moren_zhiling_4').click(function(){
+        $('#c-zhiling').val(`根据我提供的内容，改写出新的文章，
+-要求：
+1、文章要跟之前的不一样，不仅仅是换近义词，整体都要改写洗稿；
+2、图片不要保留，直接删除图片，不要保留图片的任何信息；
+3、使用Markdown格式直接输出文章`);
+    });
+</script>

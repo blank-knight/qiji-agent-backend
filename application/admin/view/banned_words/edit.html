@@ -1,0 +1,54 @@
+
+
+<form id="add-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+    {:token()}
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">实名:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-realname" class="form-control" name="row[realname]"  type="text" placeholder="实名" value="{$row.realname}" >
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">证件号:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-number" class="form-control" name="row[number]"  type="text" placeholder="证件号" value="{$row.number}" >
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">地址:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-address" class="form-control" name="row[address]"  type="text" placeholder="地址" value="{$row.address}" >
+        </div>
+    </div>
+
+
+
+    <div class="form-group mode2_block"  >
+        <label class="control-label col-xs-12 col-sm-2">审核状态:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_radios('row[status]', ['0'=>'待审核','1'=>'认证通过','2'=>'审核失败'],$row['status'])}
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">失败备注:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-remark" class="form-control" name="row[remark]"  type="text" placeholder="失败备注" value="{$row.remark}" >
+        </div>
+    </div>
+
+
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-primary btn-embossed disabled">{:__('OK')}</button>
+            <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+        </div>
+    </div>
+</form>
+
+<script src="__CDN__/user_assets/layui/jquery-3.7.1.js?v={$Think.config.site.version}"></script>
+
+

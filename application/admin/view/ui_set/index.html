@@ -1,0 +1,64 @@
+<style>
+    .control-label{line-height: 30px;}
+    .form-group-inline{display: inline-block;border-bottom: 1px solid #eee;width: 100%;padding-bottom: 10px;}
+    .reset_color{font-size: 14px;margin-left: 20px;background: #4397fd;color: #fff;border-radius: 5px;padding: 5px 10px;cursor: pointer;}
+</style>
+<div class="row animated fadeInRight">
+
+    <div class="" style="display: block;width: 70%;margin-left: 40px;">
+        <div class="panel-heading" style="font-weight: bold;font-size: 20px;">
+            UI界面配置
+
+            <span class="reset_color" >恢复默认颜色</span>
+        </div>
+        <div class="box box-primary">
+            
+            <div class="panel-body">
+
+                <form id="update-form" role="form" data-toggle="validator" method="POST" action="{:url('ui_set/update')}">
+                    {:token()}
+                    <div class="box-body box-profile ">
+                        {foreach $ui_set_color as $k=>$v}
+                        <div class="form-group form-group-inline aliyun_key">
+                            <label for="{$v.name}" class="control-label  col-xs-12 col-sm-3">{$v.title}:</label>
+                            <div class="col-xs-12 col-sm-8">
+                                {if $v.name=='daping_head_img'}
+                                    <div class="input-group">
+                                        <input id="c-{$v.name}" data-rule="" class="form-control" size="50" name="row[{$v.name}]" type="text" value="{$v.value}">
+                                        <div class="input-group-addon no-border no-padding">
+                                            <span><button type="button" id="faupload-{$v.name}" class="btn btn-danger faupload" data-input-id="c-{$v.name}" data-mimetype="image/gif,image/jpeg,image/png,image/jpg,image/bmp" data-multiple="false" data-preview-id="p-{$v.name}"><i class="fa fa-upload"></i> {:__('Upload')}</button></span>
+                                        </div>
+                                        <span class="msg-box n-right" for="c-{$v.name}"></span>
+                                    </div>
+                                    <ul class="row list-inline faupload-preview" id="p-{$v.name}"></ul>
+                                {else}
+                                    <input type="text" class="form-control ui_set_input" id="{$v.name}" name="row[{$v.name}]" value="{$v.value}" placeholder="如：#ddd" data-moren="{$v.moren}" />
+                                {/if}
+                            </div>
+                        </div>
+                        {/foreach}
+ 
+                        <div class="form-group" style="margin-top: 10px">
+                            <button type="submit" class="btn btn-primary" style="margin: 0 auto;
+    display: block;line-height: 35px;border-radius: 10px;font-size: 16px;background: linear-gradient(83deg,#927af4,#399ce4);margin-top: 20px;width: 30%;">修改配置</button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<script src="__CDN__/user_assets/layui/jquery-3.7.1.js?v={$Think.config.site.version}"></script>
+<script type="text/javascript">
+  $('.reset_color').click(function(){
+        $('.ui_set_input').each(function(){
+            $(this).val($(this).attr('data-moren'));
+        });
+        layer.msg('恢复成功，点击修改配置后生效');
+  });
+</script>

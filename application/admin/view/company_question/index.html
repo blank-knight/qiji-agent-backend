@@ -1,0 +1,37 @@
+<div class="panel panel-default panel-intro">
+
+    <div class="panel-body">
+        <div id="myTabContent" class="tab-content">
+            <div class="tab-pane fade active in" id="one">
+                <div class="widget-body no-padding">
+                    <div id="toolbar" class="toolbar">
+                         
+                        {:build_toolbar('refresh,del')} 
+                        <a href="javascript:history.back(-1)"  class="btn btn-info" title="返回上一级"><i class="fa fa-back"></i> 返回上一级</a>
+                           
+                    </div>
+                    <table id="table" class="table table-striped table-bordered table-hover table-nowrap"
+                           data-operate-edit="company_question/edit"
+                            data-operate-del="company_question/del"
+                           width="100%">
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<input type="hidden" class="ids" value="{$ids}" name="">
+
+<script src="__CDN__/user_assets/layui/jquery-3.7.1.js?v={$Think.config.site.version}"></script>
+<script type="text/javascript">
+    function del_all(type_id){
+        if(confirm("选择全部删除后，该分类的数据不可恢复，您确认全部删除吗？")){
+            $.post('/user/company_question/del_all',{type_id:type_id},function(data){
+                layer.msg(data.msg);
+                document.location.reload();
+            },'json');
+        }
+    }
+</script>

@@ -1,0 +1,39 @@
+<form id="add-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+    {:token()}
+
+    <div class="form-group">
+        <label for="c-username" class="control-label col-xs-12 col-sm-2">企业名:</label>
+        <div class="col-xs-12 col-sm-4">
+            <input id="c-username" data-rule="required" class="form-control" name="row[username]" type="text" value="" placeholder="请输入企业/个人全称">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="c-nickname" class="control-label col-xs-12 col-sm-2">昵称:</label>
+        <div class="col-xs-12 col-sm-4">
+            <input id="c-nickname" data-rule="required" class="form-control" name="row[nickname]" type="text" value="" placeholder="请输入展示在报表的昵称">
+        </div>
+    </div>
+   
+    <div class="form-group">
+        <label for="c-end_time" class="control-label col-xs-12 col-sm-2">到期时间:</label>
+        <div class="col-xs-12 col-sm-4">
+            <input id="c-end_time" data-rule="required" class="form-control datetimepicker" data-date-format="YYYY-MM-DD" data-use-current="true" name="row[end_time]" type="text" value="" placeholder="到期时间">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="c-remark" class="control-label col-xs-12 col-sm-2">备注:</label>
+        <div class="col-xs-12 col-sm-4">
+            <input id="c-remark" data-rule="" class="form-control" name="row[remark]" type="text" value="" placeholder="备注">
+        </div>
+    </div>
+
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-primary btn-embossed disabled">{:__('OK')}</button>
+            <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+        </div>
+    </div>
+</form>

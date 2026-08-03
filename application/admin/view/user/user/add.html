@@ -1,0 +1,157 @@
+<style type="text/css">
+    .red_color{color:red;margin-right: 5px;}
+</style>
+<form id="add-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+    {:token()}
+    <h3 class="control-label col-xs-12 col-sm-12" style="margin-bottom: 20px;text-align: center;color: #4e73df;font-weight: bold;margin-top: 0px;">基本信息</h3>
+    <div class="form-group">
+        <label for="c-username" class="control-label col-xs-12 col-sm-2"><i class="red_color">*</i>{:__('Username')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-username" data-rule="required" class="form-control" name="row[username]" type="text" value="" placeholder="建议使用6-12位：英文或数字">
+        </div>
+    </div>
+
+    <input id="c-money" data-rule="" class="form-control" name="row[money]" type="hidden" value="0" >
+    
+    <div class="form-group">
+        <label for="c-password" class="control-label col-xs-12 col-sm-2"><i class="red_color">*</i>{:__('Password')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-password" data-rule="password" class="form-control" name="row[password]" type="password" value="" placeholder="密码6-12位：英文或数字" autocomplete="new-password" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="c-company_name" class="control-label col-xs-12 col-sm-2"><i class="red_color">*</i>企业名:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-company_name" data-rule="required" class="form-control" name="row[company_name]" type="text" value="" placeholder="请输入企业/个人全称">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="c-nickname" class="control-label col-xs-12 col-sm-2"><i class="red_color">*</i>昵称:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-nickname" data-rule="required" class="form-control" name="row[nickname]" type="text" value="" placeholder="请输入展示在报表的昵称">
+            <p style="margin-top: 5px;color: #777;font-size: 12px;">昵称会在统计报表显示，可以输入：北京***科技公司</p>
+        </div>
+    </div>
+   
+    
+
+    
+
+    <div class="form-group">
+        <label for="c-mobile" class="control-label col-xs-12 col-sm-2">手机号码:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-mobile" data-rule="mobile" class="form-control" name="row[mobile]" type="text" value="" placeholder="手机号码">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="c-remark" class="control-label col-xs-12 col-sm-2">备注:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-remark" data-rule="" class="form-control" name="row[remark]" type="text" value="" placeholder="账号备注">
+        </div>
+    </div>
+
+    <h3 class="control-label col-xs-12 col-sm-12" style="margin-bottom: 20px;text-align: center;color: #4e73df;font-weight: bold;margin-top: 0px;font-size: 14px;">运营方案1：时间模式</h3>
+    <div class="form-group">
+        <label for="c-out_time" class="control-label col-xs-12 col-sm-2"><i class="red_color">*</i>到期时间:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-out_time" data-rule="required" class="form-control datetimepicker" data-date-format="YYYY-MM-DD" data-use-current="true" name="row[out_time]" type="text" value="{$date}" placeholder="到期时间">
+        </div>
+    </div>
+
+    <h3 class="control-label col-xs-12 col-sm-12" style="margin-bottom: 20px;text-align: center;color: #4e73df;font-weight: bold;margin-top: 0px;font-size: 14px;">运营方案2：点数模式</h3>
+    <div class="form-group">
+        <label for="c-nickname" class="control-label col-xs-12 col-sm-2">点数:</label>
+        <div class="col-xs-12 col-sm-2">
+            <input id="c-score" data-rule="" class="form-control" name="row[score]" type="number" value="10" placeholder="点数">
+        </div>
+        <label for="c-nickname" class="control-label col-xs-12 col-sm-2"><i class="red_color">*</i>存储空间(M):</label>
+        <div class="col-xs-12 col-sm-2">
+            <input id="c-memory" data-rule="" class="form-control" name="row[memory]" type="number" placeholder="单位：M" value="100">
+        </div>
+
+        <label for="c-nickname" class="control-label col-xs-12 col-sm-2">余额:</label>
+        <div class="col-xs-12 col-sm-2">
+            <input id="c-media_money" data-rule="" class="form-control" name="row[media_money]" type="number" value="0" placeholder="余额">
+        </div>
+    </div>
+
+
+    <h3 class="control-label col-xs-12 col-sm-12" style="margin-bottom: 20px;text-align: center;color: #4e73df;font-weight: bold;margin-top: 0px;font-size: 14px;">运营方案3：功能模块</h3>
+    <div class="form-group">
+        
+        <label for="c-nickname" class="control-label col-xs-12 col-sm-2">投喂账号数:</label>
+        <div class="col-xs-12 col-sm-2">
+            <input id="c-app_count" data-rule="" class="form-control" name="row[app_count]" placeholder="绑定多少个号" type="number" value="1">
+        </div>
+        <label for="c-nickname" class="control-label col-xs-12 col-sm-2">主词数量:</label>
+        <div class="col-xs-12 col-sm-2">
+            <input id="c-keyword_count" data-rule="" class="form-control" name="row[keyword_count]" type="number" value="1" placeholder="主词数量">
+        </div>
+        <label for="c-nickname" class="control-label col-xs-12 col-sm-2">问题数量:</label>
+        <div class="col-xs-12 col-sm-2">
+            <input id="c-question_count" data-rule="" class="form-control" name="row[question_count]" type="number" placeholder="拓展问题" value="10">
+            <p style="margin-top: 3px;font-size: 12px;color:#888">每个主词的问题数量</p>
+        </div>
+    </div>
+
+    <div class="form-group">
+        
+        <label for="c-nickname" class="control-label col-xs-12 col-sm-2">创作篇数:</label>
+        <div class="col-xs-12 col-sm-2">
+            <input id="c-article_count" data-rule="" class="form-control" name="row[article_count]" type="number" value="10" placeholder="创作篇数">
+        </div>
+        <label for="c-nickname" class="control-label col-xs-12 col-sm-2">发布篇数:</label>
+        <div class="col-xs-12 col-sm-2">
+            <input id="c-send_count" data-rule="" class="form-control" name="row[send_count]" type="number" value="10" placeholder="发布篇数">
+        </div>
+
+        <label for="c-nickname" class="control-label col-xs-12 col-sm-2">API实名次数:</label>
+        <div class="col-xs-12 col-sm-2">
+            <input id="c-realname_number" data-rule="" class="form-control" name="row[realname_number]" type="number" value="0" placeholder="实名次数">
+        </div>
+    </div>
+
+
+    <p style="margin-top: 5px;color: #4e73df;font-size: 13px;text-align: center;margin-bottom: 5px;">方案2/3：填0不可用，其他则限制数量，不限填99999999</p>
+    <p style="margin-top: 5px;color: red;font-size: 13px;text-align: center;margin-bottom: 20px;">三种方案可随意搭配</p>
+
+    <div class="form-group" style="display: none">
+        <label class="control-label col-xs-12 col-sm-2">自定义训练词:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_radios('row[is_edit_rule]', ['1'=>'可以自定义', '0'=>'后台协助配置'],1)}
+            <p style="margin-top: 5px;color: #999;font-size: 12px;">选择后台协助的话，用户不可自己修改训练词</p>
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <label for="c-avatar" class="control-label col-xs-12 col-sm-2">头像:</label>
+        <div class="col-xs-12 col-sm-8">
+            <div class="input-group">
+                <input id="c-avatar" data-rule="" class="form-control" size="50" name="row[avatar]" type="text" value="">
+                <div class="input-group-addon no-border no-padding">
+                    <span><button type="button" id="faupload-avatar" class="btn btn-danger faupload" data-input-id="c-avatar" data-mimetype="image/gif,image/jpeg,image/png,image/jpg,image/bmp" data-multiple="false" data-preview-id="p-avatar"><i class="fa fa-upload"></i> {:__('Upload')}</button></span>
+                </div>
+                <span class="msg-box n-right" for="c-avatar"></span>
+            </div>
+            <ul class="row list-inline faupload-preview" id="p-avatar"></ul>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Status')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_radios('row[status]', ['normal'=>__('Normal'), 'hidden'=>__('Hidden')],'normal')}
+        </div>
+    </div>
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-primary btn-embossed disabled">{:__('OK')}</button>
+            <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+        </div>
+    </div>
+</form>

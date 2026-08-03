@@ -1,0 +1,66 @@
+
+<form id="edit-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+    {:token()}
+
+    <div class="form-group">
+        <label for="c-name" class="control-label col-xs-12 col-sm-2">名称:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-name" data-rule="" class="form-control" name="row[name]" type="text" value="{$row.name}" placeholder="自定义名称">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">图片类型:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_radios('row[type]', ['1'=>'轮播图','2'=>'主页功能推荐'], $row.type)}
+            <p style="margin-top: 5px;font-size: 12px;margin-top: 5px;">主页功能推荐最多显示前4个，不添加则完全不显示</p>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="c-img_url" class="control-label col-xs-12 col-sm-2">图片:</label>
+        <div class="col-xs-12 col-sm-8">
+            <div class="input-group">
+                <input id="c-img_url" data-rule="" class="form-control"  name="row[img_url]" type="text" value="{$row.img_url}">
+                <div class="input-group-addon no-border no-padding">
+                    <span><button type="button" id="faupload-img_url" class="btn btn-danger faupload" data-input-id="c-img_url" data-mimetype="image/*" data-multiple="false" data-preview-id="p-img_url"><i class="fa fa-upload"></i> {:__('Upload')}</button></span>
+                </div>
+                <span class="msg-box n-right" for="c-img_url"></span>
+            </div>
+            <ul class="row list-inline faupload-preview" id="p-img_url"></ul>
+            <p style="color:#999;font-size: 12px;margin-top: 5px;">轮播图推荐尺寸：2560*600px；主页功能推荐尺寸：800*600px</p>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="c-url" class="control-label col-xs-12 col-sm-2">访问链接:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-url" data-rule="" class="form-control" name="row[url]" type="text" value="{$row.url}" placeholder="http://xxxx">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">打开方式:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_radios('row[target]', ['_parent'=>'默认打开','_blank'=>'新窗口打开'], $row.target)}
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="c-dsort" class="control-label col-xs-12 col-sm-2">排序:</label>
+        <div class="col-xs-12 col-sm-4">
+            <input id="c-dsort" data-rule="" class="form-control" name="row[dsort]" type="number" value="{$row.dsort}">
+            <p style="margin-top: 5px;font-size: 12px;margin-top: 5px;">越大越靠前,仅轮播图类型生效</p>
+        </div>
+    </div>
+
+
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-primary btn-embossed disabled">{:__('OK')}</button>
+            <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+        </div>
+    </div>
+</form>
+

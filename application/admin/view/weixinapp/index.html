@@ -1,0 +1,32 @@
+<style type="text/css">
+    .toolbar a svg{width: 20px;height: auto;vertical-align: bottom;}
+    .btn-success{background: #222;}
+</style>
+<div class="panel panel-default panel-intro">
+    <div class="panel-body">
+        <div id="myTabContent" class="tab-content">
+            <div class="tab-pane fade active in" id="one">
+                <div class="widget-body no-padding">
+                    <!-- <div style="color:red;font-weight: bold;">温馨提醒：该账号为公共测试账号，请谨慎绑定账号进系统，可能会被其他测试人员拿去发布违法违规文章，如绑定的客户被封号或其他异常，后果自负。</div> -->
+                    <div id="toolbar" class="toolbar">
+                        
+                            {:build_toolbar('refresh,del')} 
+                            <!-- <a href="/user/weixinapp2/add_ck" class="btn btn-success  btn-dialog" title="COOKIE授权" style="background: linear-gradient(83deg,#927af4,#399ce4);">Cookie授权</a> -->
+                              
+                           
+                    </div>
+
+                    <table id="table" class="table table-striped table-bordered table-hover table-nowrap"
+                           data-operate-edit="weixinapp/edit"
+                            data-operate-del="weixinapp/del"
+                           width="100%">
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="__CDN__/user_assets/layui/jquery-3.7.1.js?v={$Think.config.site.version}"></script>
+    

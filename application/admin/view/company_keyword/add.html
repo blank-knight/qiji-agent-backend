@@ -1,0 +1,48 @@
+<style type="text/css">
+    .mode2_block{display: none;}
+</style>
+
+<form id="add-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+    {:token()}
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">主词:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-keyword" class="form-control" name="row[keyword]" data-rule="required" type="text" placeholder="训练词" value="" >
+            <p style="margin-top: 5px;font-size: 12px;color:#666;">主词，只能一个，不低于3个字</p>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">企业ID:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-company_id" class="form-control" name="row[company_id]" data-rule="required" type="text" placeholder="企业ID" value="" >
+            <p style="margin-top: 5px;font-size: 12px;color:#666;">去企业列表获取id</p>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">目标转化词:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-hit_word" class="form-control" name="row[hit_word]" data-rule="required" type="text" placeholder="目标转化词" value="" >
+            <p style="margin-top: 5px;font-size: 12px;color:#666;">输入达标命中信息，逗号隔开，比如：xx科技</p>
+        </div>
+    </div>
+
+
+
+   
+    
+    
+    
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-primary btn-embossed " id="submitBtn">{:__('OK')}</button>
+        </div>
+    </div>
+</form>
+
+<script src="__CDN__/user_assets/layui/jquery-3.7.1.js?v={$Think.config.site.version}"></script>
+<script type="text/javascript">
+    
+</script>

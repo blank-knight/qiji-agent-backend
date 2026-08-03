@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>总后台 - 控制台</title>
+    <!-- 引入Tailwind CSS -->
+    <script src="/layui/3.4.17.js"></script>
+    <!-- 引入Chart.js -->
+    <script src="/layui/chart.umd.min.js"></script>
+    <script src="/layui/jquery-3.7.1.js"></script>
+    <script src="/layui/layui.js"></script>
+
+    <style type="text/css">
+        .divide-y td,.divide-y th{text-align: center;}
+    .text-sm {font-size: 12px !important;}
+    .page_block a{cursor: pointer;}
+
+    @media screen and  (max-width: 640px) {
+        .container h1{font-size:20px;}
+    }
+    
+
+    @media screen and  (min-width: 640px) and  (max-width: 3040px) {
+        .container h1{font-size:40px;}
+    }
+    
+    .text-2xl {
+        font-size: 2.8rem;
+        line-height: 4rem;
+    }
+    @media (min-width: 1024px){
+        .lg\:grid-cols-4 {
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+        }
+    }
+    </style>
+    
+    <!-- 配置Tailwind自定义颜色和字体 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#36CFC9',
+                        success: '#52C41A',
+                        warning: '#FAAD14',
+                        danger: '#FF4D4F',
+                        deepseek: '#4d6bfe',
+                        yuanbao: '#5ec829',
+                        qianwen: '#625cee',
+                        wenxin: '#36CFC9',
+                        doubao: '#f38495',
+                        dark: '#1D2129',
+                        'light-gray': '#F2F3F5',
+                        'mid-gray': '#C9CDD4'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .card-shadow {
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            }
+            .hover-lift {
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+            .hover-lift:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .gradient-bg {
+                background: linear-gradient(135deg, #165DFF 0%, #36CFC9 100%);
+            }
+        }
+    </style>
+</head>
+<body class="font-inter bg-gray-50 text-dark">
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-sm fixed top-0 left-0 right-0 z-50 transition-all duration-300" id="navbar" style="display: none">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                
+                
+                <!-- 右侧功能区 -->
+                <div class="flex items-center space-x-4">
+              
+                    
+                    <!-- 移动端菜单按钮 -->
+                    <button type="button" class="md:hidden text-gray-500 hover:text-primary focus:outline-none" id="mobile-menu-button">
+                        <i class="fa fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 pt-5 pb-16">
+        <!-- banner -->
+        
+        <!-- 核心指标卡片 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            
+            <!-- 总关键词数 -->
+            <div class=" rounded-xl p-6 card-shadow hover-lift" style="background: linear-gradient(223deg,#8b55dc,#3db2ff);color:#fff;">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p  class=" font-medium" style="font-size: 20px;">企业数</p>
+                        <h3 class="text-2xl font-bold mt-1 mb-2">{$totaluser}</h3>
+                        <p class="text text-sm flex items-center">
+                            <i class="fa fa-arrow-up mr-1"></i> 企业开户量 
+                        </p>
+                    </div>
+                    <div class="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                        <img src="/user_assets/img/daohang/user.png">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 首页关键词 -->
+            <div class=" rounded-xl p-6 card-shadow hover-lift" style="background: linear-gradient(71deg,#2cbc37,#85d925);color:#fff;">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class=" font-medium" style="font-size: 20px;">AI创作文章</p>
+                        <h3 class="text-2xl font-bold mt-1 mb-2">{$article_count}</h3>
+                        <p class="text text-sm flex items-center">
+                            AI创作文章总数量
+                        </p>
+                    </div>
+                    <div class="h-12 w-12 rounded-full bg-success/10 flex items-center justify-center">
+                        <img src="/user_assets/img/daohang/daohang3.png">
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 上升关键词 -->
+            <div class=" rounded-xl p-6 card-shadow hover-lift" style="background: linear-gradient(61deg,#8c54df,#d0b0ff);color: #fff">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class=" font-medium" style="font-size: 20px;">自媒体分发</p>
+                        <h3 class="text-2xl font-bold mt-1 mb-2">{$send_count}</h3>
+                        <p class="text text-sm flex items-center">
+                            <i class="fa fa-arrow-up mr-1"></i> AI媒体投喂文章数量 
+                        </p>
+                    </div>
+                    <div class="h-12 w-12 rounded-full bg-secondary/10 flex items-center justify-center">
+                        <img src="/user_assets/img/daohang/daohang9.png">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 下降关键词 -->
+            <div class=" rounded-xl p-6 card-shadow hover-lift" style="background: linear-gradient(61deg,#ffa922,#ef4833);color: #fff">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class=" font-medium" style="font-size: 20px;">授权账号</p>
+                        <h3 class="text-2xl font-bold mt-1 mb-2">{$app_count}</h3>
+                        <p class=" text-sm flex items-center">
+                            投喂账号授权总量
+                        </p>
+                    </div>
+                    <div class="h-12 w-12 rounded-full bg-danger/10 flex items-center justify-center">
+                        <img src="/user_assets/img/daohang/daohang1.png">
+                    </div>
+                </div>
+            </div>
+
+            <div class=" rounded-xl p-6 card-shadow hover-lift" style="background: linear-gradient(223deg,#ffa922,#673da5);color:#fff;">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p  class=" font-medium" style="font-size: 20px;">已发官媒</p>
+                        <h3 class="text-2xl font-bold mt-1 mb-2">{$media_order_count} 条</h3>
+                        <p class="text text-sm flex items-center">
+                            <i class="fa fa-arrow-up mr-1"></i> 历史发布数 
+                        </p>
+                    </div>
+                    <div class="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                        <img src="/user_assets/img/daohang/daohang5.png">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        
+        <!-- 图表区域 -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <!-- 平台占比饼图 -->
+            <div class="bg-white rounded-xl p-6 card-shadow lg:col-span-1">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="font-bold text-lg">平台收录占比</h3>
+                </div>
+                <div class="flex justify-center">
+                    <div class="h-64 w-64 relative">
+                        <canvas id="platformPieChart"></canvas>
+                    </div>
+                </div>
+                <div class="mt-4 grid grid-cols-3 gap-2">
+                    <div class="flex items-center">
+                        <span class="h-3 w-3 rounded-full bg-deepseek mr-2"></span>
+                        <span class="text-sm">deepseek</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="h-3 w-3 rounded-full bg-doubao mr-2"></span>
+                        <span class="text-sm">豆包</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="h-3 w-3 rounded-full bg-yuanbao mr-2"></span>
+                        <span class="text-sm">元宝</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="h-3 w-3 rounded-full bg-qianwen mr-2"></span>
+                        <span class="text-sm">千问</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="h-3 w-3 rounded-full bg-wenxin mr-2"></span>
+                        <span class="text-sm">文心</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="h-3 w-3 rounded-full bg-qianwen mr-2"></span>
+                        <span class="text-sm">纳米</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="h-3 w-3 rounded-full bg-doubao mr-2"></span>
+                        <span class="text-sm">kimi</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="h-3 w-3 rounded-full bg-yuanbao mr-2"></span>
+                        <span class="text-sm">智谱</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 排名趋势折线图 -->
+            <div class="bg-white rounded-xl p-6 card-shadow lg:col-span-2">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="font-bold text-lg">问题收录</h3>
+                    <div class="flex space-x-2">
+                        <button class="px-3 py-1 text-xs rounded-full bg-deepseek/10 text-deepseek">deepseek</button>
+                        <button class="px-3 py-1 text-xs rounded-full bg-doubao/10 text-doubao">豆包</button>
+                        <button class="px-3 py-1 text-xs rounded-full bg-yuanbao/10 text-yuanbao">元宝</button>
+                        <button class="px-3 py-1 text-xs rounded-full bg-qianwen/10 text-qianwen">千问</button>
+                        <button class="px-3 py-1 text-xs rounded-full bg-wenxin/10 text-wenxin">文心</button>
+                        <button class="px-3 py-1 text-xs rounded-full bg-qianwen/10 text-wenxin">纳米</button>
+                        <button class="px-3 py-1 text-xs rounded-full bg-doubao/10 text-wenxin">kimi</button>
+                        <button class="px-3 py-1 text-xs rounded-full bg-yuanbao/10 text-wenxin">智谱</button>
+                    </div>
+                </div>
+                <div>
+                    <canvas id="rankingTrendChart" height="240"></canvas>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- 核心指标卡片 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- 总关键词数 -->
+            <div class="bg-white rounded-xl p-6 card-shadow hover-lift" >
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">问题总量</p>
+                        <h3 class="text-2xl font-bold mt-1 mb-2">{$ask_total}</h3>
+                        <p class="text-success text-sm flex items-center">
+                            <i class="fa fa-arrow-up mr-1"></i> AI拓展问题数量 
+                        </p>
+                    </div>
+                    <div class="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                        <img src="/user_assets/img/daohang/user.png">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 首页关键词 -->
+            <div class="bg-white rounded-xl p-6 card-shadow hover-lift">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">收录总量</p>
+                        <h3 class="text-2xl font-bold mt-1 mb-2">{$shoulu_total}</h3>
+                        <p class="text-success text-sm flex items-center">
+                            8大平台收录量
+                        </p>
+                    </div>
+                    <div class="h-12 w-12 rounded-full bg-success/10 flex items-center justify-center">
+                        <svg t="1754578714422" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="32410" width="200" height="200"><path d="M512 512m-485.4784 0a485.4784 485.4784 0 1 0 970.9568 0 485.4784 485.4784 0 1 0-970.9568 0Z" fill="#FBA3A3" p-id="32411"></path><path d="M632.6272 254.72m44.6976 0l27.9552 0q44.6976 0 44.6976 44.6976l0 292.5056q0 44.6976-44.6976 44.6976l-27.9552 0q-44.6976 0-44.6976-44.6976l0-292.5056q0-44.6976 44.6976-44.6976Z" fill="#FFFFFF" p-id="32412"></path><path d="M453.3248 329.216m44.6976 0l27.9552 0q44.6976 0 44.6976 44.6976l0 217.9584q0 44.6976-44.6976 44.6976l-27.9552 0q-44.6976 0-44.6976-44.6976l0-217.9584q0-44.6976 44.6976-44.6976Z" fill="#FFFFFF" p-id="32413"></path><path d="M274.0224 412.2112m44.6976 0l27.9552 0q44.6976 0 44.6976 44.6976l0 135.0144q0 44.6976-44.6976 44.6976l-27.9552 0q-44.6976 0-44.6976-44.6976l0-135.0144q0-44.6976 44.6976-44.6976Z" fill="#FFFFFF" p-id="32414"></path><path d="M220.16 666.0608m41.8304 0l496.9472 0q41.8304 0 41.8304 41.8304l0 17.6128q0 41.8304-41.8304 41.8304l-496.9472 0q-41.8304 0-41.8304-41.8304l0-17.6128q0-41.8304 41.8304-41.8304Z" fill="#FFFFFF" p-id="32415"></path></svg>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 上升关键词 -->
+            <div class="bg-white rounded-xl p-6 card-shadow hover-lift">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">训练平台</p>
+                        <h3 class="text-2xl font-bold mt-1 mb-2">8</h3>
+                        <p class="text-success text-sm flex items-center">
+                            <i class="fa fa-arrow-up mr-1"></i> 训练平台数量 
+                        </p>
+                    </div>
+                    <div class="h-12 w-12 rounded-full bg-secondary/10 flex items-center justify-center">
+                        <svg t="1754578387441" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="19386" width="200" height="200"><path d="M769.2 914.7c-171.5 61.4-343 61.4-514.5 0-54.6-21.4-124.1-90.9-145.4-145.4-61.4-171.5-61.4-343 0-514.5 21.4-54.6 90.9-124.1 145.4-145.4 171.5-61.4 343-61.4 514.5 0 54.6 21.4 124.1 90.9 145.4 145.4 61.4 171.5 61.4 343 0 514.5-21.3 54.5-90.8 124-145.4 145.4z" fill="#28CE8A" p-id="19387"></path><path d="M515.9 508.2c13.5-11.8 23.5-21 26.7-24.6 7.8-10.4 11.7-23.5 11.7-38.9 0-19.2-6.4-34.6-19-45.6-12.4-11.1-29.1-16.7-49.8-16.7-23 0-41.5 6.7-55.1 19.9-13.8 13.2-20.6 31.1-20.6 54.8v2h38.9v-2c0-12.7 2.4-22.4 7.3-29 5.3-7.9 14.2-11.7 27.2-11.7 10 0 17.8 2.7 23.1 8 5.3 5.6 8.1 13.2 8.1 22.6 0 7.3-2.6 14.2-7.8 20.5l-3.5 4.1c-20.4 18.2-32.3 31.2-36.4 39.5-4.3 8.2-6.3 18.3-6.3 30.9v6.3h39.2V542c0-6.9 1.5-13.1 4.4-19 3-5.8 6.9-10.7 11.9-14.8zM480 559.3c-7.3 0-13.2 2.3-18.2 7-4.9 4.6-7.4 10.6-7.4 18s2.5 13.4 7.4 18c5.2 4.8 11.3 7.3 18.2 7.3 7.2 0 13.2-2.3 18.2-7 5.1-4.7 7.7-11 7.7-18.3 0-7-2.4-13.1-7.4-18-5-4.6-11.2-7-18.5-7z" fill="#FFFFFF" p-id="19388"></path><path d="M757.6 731.7l-87.9-87.9c34.8-41.3 55.7-94.5 55.7-152.6C725.4 360.4 619 254 488.2 254c-81 0-155.6 40.7-199.5 108.9-1.7 2.7-3.4 5.5-5.1 8.2-4.6 7.8-8.8 16-12.5 24.4-5 11.3 0.1 24.5 11.4 29.4 11.3 5 24.5-0.1 29.4-11.4 3-6.7 6.4-13.4 10.1-19.7 1.3-2.3 2.7-4.5 4.1-6.7 35.7-55.4 96.3-88.5 162-88.5 106.1 0 192.4 86.4 192.4 192.5s-86.4 192.4-192.4 192.4c-84.7 0-160.6-56.7-184.6-137.9-3.5-11.8-15.9-18.6-27.8-15.1-11.8 3.5-18.6 15.9-15.1 27.8 29.6 100.1 123.1 169.9 227.5 169.9 56.6 0 108.7-20 149.5-53.3l88.2 88.2c4.4 4.4 10.1 6.6 15.8 6.6 5.8 0 11.4-2.2 15.8-6.6 8.9-8.5 8.9-22.6 0.2-31.4z" fill="#FFFFFF" p-id="19389"></path></svg>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 下降关键词 -->
+            <div class="bg-white rounded-xl p-6 card-shadow hover-lift">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">蒸馏词</p>
+                        <h3 class="text-2xl font-bold mt-1 mb-2">{$keyword_total}</h3>
+                        <p class="text-danger text-sm flex items-center">
+                            主训练词数量
+                        </p>
+                    </div>
+                    <div class="h-12 w-12 rounded-full bg-danger/10 flex items-center justify-center">
+                        <svg t="1754578781066" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="36578" width="200" height="200"><path d="M512 512m-512 0a512 512 0 1 0 1024 0 512 512 0 1 0-1024 0Z" fill="#5EC829" p-id="36579"></path><path d="M704.512 462.0288H655.36a213.6064 213.6064 0 0 1 14.9504 66.7648 174.8992 174.8992 0 1 1-178.5856-174.6944 179.2 179.2 0 0 1 66.9696 14.9504v-44.6464l11.264-11.264a174.2848 174.2848 0 0 0-78.2336-14.7456A232.448 232.448 0 1 0 722.944 532.48a192.512 192.512 0 0 0-14.9504-78.0288z" fill="#FFFFFF" p-id="36580"></path><path d="M540.8768 421.0688a94.4128 94.4128 0 0 0-48.3328-11.4688 120.832 120.832 0 0 0 0 241.664 117.3504 117.3504 0 0 0 118.9888-115.9168V532.48a104.2432 104.2432 0 0 0-11.264-48.3328l-55.5008 55.9104a45.4656 45.4656 0 0 1-33.5872 11.0592 30.1056 30.1056 0 0 1-29.696-11.0592 36.2496 36.2496 0 0 1-10.4448-29.696 56.32 56.32 0 0 1 11.264-29.9008z" fill="#FFFFFF" p-id="36581"></path><path d="M500.1216 510.3616c0 3.6864 0 7.3728 3.6864 7.3728 7.3728 7.3728 14.9504 7.3728 18.6368 0l85.4016-85.6064h81.92l92.7744-92.9792h-96.6656v-100.352c3.8912 0-96.6656 100.5568-96.6656 100.5568v78.0288l-85.4016 85.4016a12.0832 12.0832 0 0 0-3.6864 7.5776z" fill="#FFFFFF" p-id="36582"></path></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </main>
+
+
+    <!-- JavaScript -->
+    <script>
+       
+        // 初始化图表
+        document.addEventListener('DOMContentLoaded', function() {
+            // 平台占比饼图
+            const platformPieCtx = document.getElementById('platformPieChart').getContext('2d');
+            const platformPieChart = new Chart(platformPieCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['deepseek', '豆包', '元宝', '千问', '文心', '纳米ai', 'kimi', '智谱'],
+                    datasets: [{
+                        data: [{$deepseek_shoulu}, {$doubao_shoulu}, {$yuanbao_shoulu},{$qianwen_shoulu},{$wenxin_shoulu},{$nami_shoulu},{$kimi_shoulu},{$zhipu_shoulu}],
+                        backgroundColor: ['#4d6bfe', '#f38495', '#5ec829', '#625cee', '#36CFC9'],
+                        borderWidth: 0,
+                        hoverOffset: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.raw}%`;
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true
+                    }
+                }
+            });
+            
+            // 排名趋势折线图
+            const trendCtx = document.getElementById('rankingTrendChart').getContext('2d');
+            const trendChart = new Chart(trendCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['deepseek', '豆包', '腾讯元宝', '通义千问', '文心一言', '纳米AI', 'kimi', '智谱'],
+                    datasets: [
+
+                        {
+                            label: '收录',
+                            data: [{$deepseek_count}, {$doubao_count}, {$yuanbao_count}, {$qianwen_count}, {$wenxin_count}, {$nami_count}, {$kimi_count}, {$zhipu_count}],
+                            backgroundColor: ['#4d6bfe','#f38495','#5ec829','#625cee','#36CFC9'],
+                            tension: 0.4,
+                            fill: true
+                        },
+                        
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '平台排名'
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    }
+                }
+            });
+            
+ 
+            
+        });
+    
+        $(function(){
+            
+            if(localStorage.getItem("kongjia_notice2")!=1){
+                setTimeout(function(){
+                    content = ` <div style="font-size:16px;line-height:40px;">
+                                    <p><strong>1、商户控价</strong>：开户无论用任何形式，不低于控价(请咨询开发者)；</p>
+                                    <p><strong>2、代理控价</strong>：无论任何组合策略，不低于控价(请咨询开发者)；</p>
+                                    <p><strong>3、源码部署</strong>：二次搭建控价，有意请咨询开发者；</p>
+                                    <p style="line-height:30px;">
+                                        <span style="line-height:30px;color:#666;font-size:13px;">如违反以上规定：</span>
+                                        <br>首次发现封禁系统1天；
+                                        <br>第二次发现封禁系统7天；
+                                        <br>第三次发现永久封禁该域名不解封、并后续产品不予该公司合作；
+                                    </p>
+                                    <p style="line-height:30px;color:#666;font-size:13px;">备注：后续有调控价格本公告会重新通知</p>
+                                </div>`;
+                    layer.open({
+                        title: '最新产品控价公告-2025年',
+                        content:content,
+                        area: ['50%', '60%'],
+                        shadeClose: true, // 点击遮罩关闭
+                        shade: 0.8, // 遮罩层的透明度
+                        btn: ['我已知悉'],
+                        yes: function (index, layero) {
+                            localStorage.setItem("kongjia_notice2",1);
+                            layer.close(index);
+                        },
+                        success: function (layero, index) {
+                            // localStorage.setItem("kongjia",1);
+                        }
+                    });
+                },1000);
+            }
+            
+            
+        });
+       
+    </script>
+</body>
+</html>

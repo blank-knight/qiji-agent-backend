@@ -1,0 +1,34 @@
+
+
+<form id="add-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+    {:token()}
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">指令名称:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-name" class="form-control" name="row[name]" data-rule="required" type="text" placeholder="指令名称" value="{$row.name}">
+        </div>
+    </div>
+
+    <div class="form-group" >
+        <label class="control-label col-xs-12 col-sm-2">写作类型:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_radios('row[create_type]', ['1'=>'文章创作', '2'=>'标题创作'],$row.create_type)}
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">指令内容:</label>
+        <div class="col-xs-12 col-sm-8">
+            <textarea id="c-zhiling" class="form-control" rows="15" name="row[zhiling]" data-rule="required" type="text" placeholder="指令名称">{$row.zhiling}</textarea>
+        </div>
+    </div>
+
+
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-primary btn-embossed disabled">{:__('OK')}</button>
+            <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+        </div>
+    </div>
+</form>

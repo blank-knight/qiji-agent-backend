@@ -1,0 +1,43 @@
+
+
+<form id="add-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+    {:token()}
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">指令名称:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-name" class="form-control" name="row[name]" data-rule="required" type="text" placeholder="指令名称" value="">
+        </div>
+    </div>
+
+    <div class="form-group" >
+        <label class="control-label col-xs-12 col-sm-2">写作类型:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_radios('row[create_type]', ['1'=>'文章创作', '2'=>'标题创作'],1)}
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">指令内容:</label>
+        <div class="col-xs-12 col-sm-8">
+            <textarea id="c-zhiling" class="form-control" rows="15" name="row[zhiling]" data-rule="required" type="text" placeholder="指令内容"></textarea>
+
+            <style type="text/css">
+                .moren_zhiling{width: 100px;line-height: 30px;border-radius: 10px;color: #fff;background: linear-gradient(83deg,#927af4,#399ce4);font-size: 13px;margin: 10px auto;text-align: center;cursor: pointer;margin-right: 10px;display: inline-block;}
+            </style>
+    
+        </div>
+
+
+    </div>
+
+
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-primary btn-embossed disabled">{:__('OK')}</button>
+            <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+        </div>
+    </div>
+</form>
+
+<script src="__CDN__/user_assets/layui/jquery-3.7.1.js?v={$Think.config.site.version}"></script>
