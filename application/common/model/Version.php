@@ -38,7 +38,7 @@ class Version extends Model
                 'newversion'  => $versionRow['newversion'],
                 'downloadurl' => $versionRow['downloadurl'],
                 'packagesize' => $versionRow['packagesize'],
-                'upgradetext' => $versionRow['content'],
+                'upgradetext' => $versionRow['upgradetext'],
             ];
         }
 

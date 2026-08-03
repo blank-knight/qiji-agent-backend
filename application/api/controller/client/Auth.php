@@ -89,7 +89,7 @@ class Auth extends Api
 
             $userInfo = $this->buildUserInfo($auth->getUser());
             $this->success('注册成功', [
-                'token'     => $auth->_token,
+                'token'     => $auth->getToken(),
                 'user_info' => $userInfo,
             ]);
         } else {
@@ -116,7 +116,7 @@ class Auth extends Api
         if ($ret) {
             $userInfo = $this->buildUserInfo($auth->getUser());
             $this->success('登录成功', [
-                'token'     => $auth->_token,
+                'token'     => $auth->getToken(),
                 'user_info' => $userInfo,
             ]);
         } else {

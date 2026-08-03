@@ -6,14 +6,10 @@
 define('APP_PATH', __DIR__ . '/../application/');
 
 // 绑定到 admin 模块
-\think\Route::bind('admin');
+define('BIND_MODULE', 'admin');
 
-// 关闭路由
-\think\App::route(false);
-
-// 设置根域名
-\think\Url::root('');
-
+// 加载框架引导文件
 require __DIR__ . '/../thinkphp/base.php';
 
+// 执行应用
 \think\App::run()->send();

@@ -17,11 +17,13 @@ return [
     // 应用命名空间
     'app_namespace'        => 'app',
     // 应用调试模式
-    'app_debug'            => \think\Env::get('app.debug', false),
+    'app_debug'            => \think\Env::get('app.debug', true),
     // 应用Trace
     'app_trace'            => \think\Env::get('app.trace', false),
     // 应用模式状态
     'app_status'           => 'office',
+    // 时区
+    'default_timezone'     => 'Asia/Shanghai',
     // 是否支持多模块
     'app_multi_module'     => true,
     // 入口自动绑定模块
@@ -293,5 +295,17 @@ return [
         'name'      => 'FastAdmin',
         'version'   => '1.0.0',
         'user'      => 'FastAdmin',
+    ],
+
+    // Token 配置
+    'token'                => [
+        // 驱动方式
+        'type'     => 'File',
+        // 缓存保存目录
+        'path'     => CACHE_PATH . 'token' . DS,
+        // 缓存有效期 0表示永久缓存
+        'expire'   => 0,
+        // 缓存前缀
+        'prefix'   => 'token',
     ],
 ];
