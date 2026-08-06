@@ -56,6 +56,7 @@ class Config extends Backend
             }
             $value = $v->toArray();
             $value['title'] = __($value['title']);
+            $value['extend_html'] = isset($value['extend_html']) ? $value['extend_html'] : '';
             if (in_array($value['type'], ['select', 'selects', 'checkbox', 'radio'])) {
                 $value['value'] = explode(',', $value['value']);
             }

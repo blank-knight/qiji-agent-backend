@@ -1,13 +1,13 @@
 <?php
 
-namespace app\admin\controller;
+namespace app\admin\controller\agent;
 
 use app\common\controller\Backend;
 
 /**
  * 邀请码管理（总后台）
  */
-class AgentInvite extends Backend
+class Agentinvite extends Backend
 {
     protected $model = null;
 

@@ -302,8 +302,19 @@ if (!function_exists('build_heading')) {
     function build_heading($title = null, $content = null, $model = null)
     {
         if ($title === null) {
-            $title = Request::instance()->controller();
-            $title = ucwords(str_replace(['_', '.'], ' ', $title));
+            // 尝试从菜单表获取中文标题
+            $controller = Request::instance()->controller();
+            // 多级控制器名 agent.agent → agent/agent 匹配数据库 name 字段
+            $ruleName = str_replace('.', '/', strtolower($controller));
+            try {
+                $menuTitle = \think\Db::name('auth_rule')
+                    ->where('name', $ruleName)
+                    ->value('title');
+            } catch (\Exception $e) {
+                $menuTitle = null;
+            }
+            $title = $menuTitle ?: ucwords(str_replace(['_', '.'], ' ', $controller));
+            $title = __($title);
         }
         $html = '';
         if ($title) {

@@ -125,12 +125,12 @@ require.config({
 
 require(['jquery', 'bootstrap'], function ($, undefined) {
     //初始配置
-    var Config = requirejs.s.contexts._.config.config;
+    var Config = requirejs.s.contexts._.config.config.site;
     //将Config渲染到全局
     window.Config = Config;
     // 配置语言包的路径
     var paths = {};
-    paths['lang'] = Config.moduleurl + '/ajax/lang?callback=define&controllername=' + Config.controllername + '&lang=' + Config.language;
+    paths['lang'] = '/' + Config.moduleurl + '/ajax/lang?callback=define&controllername=' + Config.controllername + '&lang=' + Config.language;
     // 避免目录冲突
     paths['backend/'] = 'backend/';
     require.config({paths: paths});

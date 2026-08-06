@@ -86,6 +86,14 @@ abstract class Paginator
         return $paginator->items;
     }
 
+    /**
+     * 获取数据集（供 PaginatorCollection->__call 代理调用）
+     */
+    public function items()
+    {
+        return $this->items->all();
+    }
+
     protected function setCurrentPage($currentPage)
     {
         if (!$this->simple && $currentPage > $this->lastPage) {

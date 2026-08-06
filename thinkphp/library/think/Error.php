@@ -24,7 +24,8 @@ class Error
      */
     public static function register()
     {
-        error_reporting(E_ALL);
+        // PHP 8.1: 屏蔽 deprecation 和 notice（TP5.0 模板中有大量 null 传参）
+        error_reporting(E_ALL & ~E_DEPRECATED & ~E_NOTICE);
         set_error_handler([__CLASS__, 'appError']);
         set_exception_handler([__CLASS__, 'appException']);
         register_shutdown_function([__CLASS__, 'appShutdown']);

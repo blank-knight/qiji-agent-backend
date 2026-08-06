@@ -1,6 +1,6 @@
 <?php
 
-namespace app\admin\controller;
+namespace app\admin\controller\agent;
 
 use app\common\controller\Backend;
 use think\Db;

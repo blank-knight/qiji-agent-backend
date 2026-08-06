@@ -101,6 +101,8 @@ class Index extends Backend
         Auth::instance()->autologin();
 
         Session::set('referer', $url);
+        $this->view->assign('background', '');
+        $this->view->assign('keeyloginhours', 24);
         return $this->view->fetch();
     }
 

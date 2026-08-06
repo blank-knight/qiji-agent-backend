@@ -1,0 +1,309 @@
+
+<form id="edit-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+    {:token()}
+    <input type="hidden" name="row[id]" value="{$row.id}">
+
+    <div class="form-group">
+        <label for="c-this_agent_url" class="control-label col-xs-12 col-sm-2">代理端链接:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-this_agent_url" data-rule="" class="form-control"  readonly type="text" value="{$this_agent_url}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="c-this_user_url" class="control-label col-xs-12 col-sm-2">用户端链接:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-this_user_url" data-rule="" class="form-control"  readonly type="text" value="{$this_user_url}">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="c-agent_id" class="control-label col-xs-12 col-sm-2">上级代理ID:</label>
+        <div class="col-xs-12 col-sm-4">
+            <input id="c-agent_id" data-rule="required" class="form-control" name="row[agent_id]" type="text" value="{$row.agent_id}" placeholder="输入代理管理的id">
+                <p style="margin-top: 5px;font-size: 12px;color:#888;">0是总后台的，填写其他则是其他代理的下级，建议这里不要动，按默认即可</p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="c-username" class="control-label col-xs-12 col-sm-2">{:__('Username')}:</label>
+        <div class="col-xs-12 col-sm-4">
+            <input id="c-username" data-rule="required" class="form-control" name="row[username]" type="text" value="{$row.username}" placeholder="建议使用6-12位：英文 + 数字">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="c-nickname" class="control-label col-xs-12 col-sm-2">{:__('Nickname')}:</label>
+        <div class="col-xs-12 col-sm-4">
+            <input id="c-nickname" data-rule="required" class="form-control" name="row[nickname]" type="text" value="{$row.nickname}" placeholder="建议使用2-10位：中文">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="c-password" class="control-label col-xs-12 col-sm-2">{:__('Password')}:</label>
+        <div class="col-xs-12 col-sm-4">
+            <input id="c-password" data-rule="password" class="form-control" name="row[password]" type="password" value="" placeholder="不改密码请留空" autocomplete="new-password" />
+        </div>
+    </div>
+
+    <h3 class="control-label col-xs-12 col-sm-12" style="margin-bottom: 20px;text-align: center;color: #4e73df;font-weight: bold;margin-top: 0px;font-size: 14px;">常规配置</h3>
+    <div class="form-group">
+        
+        <label for="c-nickname" class="control-label col-xs-12 col-sm-2">开代理数:</label>
+        <div class="col-xs-12 col-sm-2">
+            <input id="c-agent_count" data-rule="" class="form-control" name="row[agent_count]" placeholder="可开下级代理" type="number" value="{$row.agent_count}">
+        </div>
+        <label for="c-nickname" class="control-label col-xs-12 col-sm-2">开商户数:</label>
+        <div class="col-xs-12 col-sm-2">
+            <input id="c-user_count" data-rule="" class="form-control" name="row[user_count]" type="number" value="{$row.user_count}" placeholder="可开商户">
+        </div>
+        <label for="c-nickname" class="control-label col-xs-12 col-sm-2">官媒加价(倍数):</label>
+        <div class="col-xs-12 col-sm-2">
+            <input id="c-media_price_new" data-rule="" class="form-control" name="row[media_price_new]" type="number" value="{$row.media_price_new}" placeholder="官媒加倍">
+            <p style="font-size: 12px;margin-top: 5px;color: #999;">1.5为加价1.5倍</p>
+        </div>
+    </div>
+
+    <div class="form-group">
+        
+        <label for="c-nickname" class="control-label col-xs-12 col-sm-2">点数:</label>
+        <div class="col-xs-12 col-sm-2">
+            <input id="c-score" data-rule="" class="form-control" name="row[score]" placeholder="点数" type="number" value="{$row.score}">
+        </div>
+        
+        <label for="c-nickname" class="control-label col-xs-12 col-sm-2">余额:</label>
+        <div class="col-xs-12 col-sm-2">
+            <input id="c-media_money" data-rule="" class="form-control" name="row[media_money]" type="number" value="{$row.media_money}" placeholder="余额">
+        </div>
+
+        <label for="c-nickname" class="control-label col-xs-12 col-sm-2">存储空间(M):</label>
+        <div class="col-xs-12 col-sm-2">
+            <input id="c-memory" data-rule="" class="form-control" name="row[memory]" type="number" value="{$row.memory}" placeholder="存储空间(M)">
+        </div>
+   
+    </div>
+
+
+
+    <h3 class="control-label col-xs-12 col-sm-12" style="margin-bottom: 20px;text-align: center;color: #4e73df;font-weight: bold;margin-top: 0px;font-size: 14px;">功能限制</h3>
+    <div class="form-group">
+        
+        <label for="c-nickname" class="control-label col-xs-12 col-sm-2">投喂账号数:</label>
+        <div class="col-xs-12 col-sm-2">
+            <input id="c-app_count" data-rule="" class="form-control" name="row[app_count]" placeholder="绑定多少个号" type="number" value="{$row.app_count}">
+        </div>
+        <label for="c-nickname" class="control-label col-xs-12 col-sm-2">主词数量:</label>
+        <div class="col-xs-12 col-sm-2">
+            <input id="c-keyword_count" data-rule="" class="form-control" name="row[keyword_count]" type="number" value="{$row.keyword_count}" placeholder="主词数量">
+        </div>
+        <label for="c-nickname" class="control-label col-xs-12 col-sm-2">问题数量:</label>
+        <div class="col-xs-12 col-sm-2">
+            <input id="c-question_count" data-rule="" class="form-control" name="row[question_count]" type="number" placeholder="拓展问题" value="{$row.question_count}">
+            <p style="margin-top: 3px;font-size: 12px;color:#888">每个主词的问题数量</p>
+        </div>
+    </div>
+
+    <div class="form-group">
+        
+        <label for="c-nickname" class="control-label col-xs-12 col-sm-2">创作篇数:</label>
+        <div class="col-xs-12 col-sm-2">
+            <input id="c-article_count" data-rule="" class="form-control" name="row[article_count]" type="number" value="{$row.article_count}" placeholder="创作篇数">
+        </div>
+        <label for="c-nickname" class="control-label col-xs-12 col-sm-2">发布篇数:</label>
+        <div class="col-xs-12 col-sm-2">
+            <input id="c-send_count" data-rule="" class="form-control" name="row[send_count]" type="number" value="{$row.send_count}" placeholder="发布篇数">
+        </div>
+
+        <label for="c-nickname" class="control-label col-xs-12 col-sm-2">API实名次数:</label>
+        <div class="col-xs-12 col-sm-2">
+            <input id="c-realname_number" data-rule="" class="form-control" name="row[realname_number]" type="number" value="{$row.realname_number}" placeholder="实名次数">
+        </div>
+    </div>
+
+    <p style="margin-top: 5px;color: #4e73df;font-size: 13px;text-align: center;margin-bottom: 25px;">常规配置/功能配置：填0不可用，其他则限制数量，不限填99999999</p>
+
+
+
+
+    <div class="form-group">
+        <label for="c-avatar" class="control-label col-xs-12 col-sm-2">头像:</label>
+        <div class="col-xs-12 col-sm-8">
+            <div class="input-group">
+                <input id="c-avatar" data-rule="" class="form-control" size="50" name="row[avatar]" type="text" value="{$row.avatar}">
+                <div class="input-group-addon no-border no-padding">
+                    <span><button type="button" id="faupload-avatar" class="btn btn-danger faupload" data-input-id="c-avatar" data-mimetype="image/gif,image/jpeg,image/png,image/jpg,image/bmp" data-multiple="false" data-preview-id="p-avatar"><i class="fa fa-upload"></i> {:__('Upload')}</button></span>
+                </div>
+                <span class="msg-box n-right" for="c-avatar"></span>
+            </div>
+            <ul class="row list-inline faupload-preview" id="p-avatar"></ul>
+        </div>
+    </div>
+
+    
+
+    <div class="form-group">
+        <label for="c-web_name" class="control-label col-xs-12 col-sm-2">贴牌名字:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-web_name" data-rule="" class="form-control" name="row[web_name]" type="text" value="{$row.web_name|htmlentities}" placeholder="例如：xxx系统">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="c-web_url" class="control-label col-xs-12 col-sm-2">贴牌域名:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-web_url" data-rule="" class="form-control" name="row[web_url]" type="text" value="{$row.web_url|htmlentities}" placeholder="例如：xxx.xxx.com ，不要加https跟/结尾">
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Status')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_radios('row[status]', ['normal'=>__('Normal'), 'hidden'=>'关闭'], $row['status'])}
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="c-out_time" class="control-label col-xs-12 col-sm-2">到期时间:</label>
+        <div class="col-xs-12 col-sm-4">
+            <input id="c-out_time" data-rule="required" class="form-control" name="row[out_time]" type="date" value="{$row['out_time']}">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="c-nickname" class="control-label col-xs-12 col-sm-2">备注:</label>
+        <div class="col-xs-12 col-sm-4">
+            <input id="c-remark"  class="form-control" name="row[remark]" type="text" value="{$row['remark']}" placeholder="账号备注">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">AI大模型配置:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_radios('row[is_custom_model]', ['0'=>'使用上级AI大模型','1'=>'自定义AI大模型'], $row['is_custom_model'])}
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">新官媒/查收录:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_radios('row[web_media_status]', ['0'=>'使用上级接口','1'=>'自定义接口'], $row['web_media_status'])}
+        </div>
+    </div>
+     <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">实名审核:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_radios('row[realname_status]', ['0'=>'无权审核','1'=>'可审核'], $row['realname_status'])}
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">其他账号配置:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_radios('row[is_custom_key]', ['0'=>'使用上级API','1'=>'自定义API'], $row['is_custom_key'])}
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">API实名审核:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_radios('row[is_realname_mobile]', ['0'=>'不使用API','1'=>'使用API自动审核'], $row['is_realname_mobile'])}
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">手动查收录:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_radios('row[shoudong_select_status]', ['0'=>'关闭','1'=>'开启'], $row['shoudong_select_status'])}
+        </div>
+    </div>
+
+    <div class="is_custom_key_div" style="display: none;">
+        
+        <div class="form-group aliyun_key">
+            <label for="aliyun_access_key" class="control-label  col-xs-12 col-sm-2">阿里云access_key:</label>
+            <div class="col-xs-12 col-sm-8">
+                <input type="text" class="form-control" id="aliyun_access_key" name="row[aliyun_access_key]" value="{$row.aliyun_access_key|htmlentities}" placeholder="请输入阿里云access_key" />
+            </div>
+        </div>
+        <div class="form-group aliyun_key">
+            <label for="aliyun_access_secret" class="control-label  col-xs-12 col-sm-2">阿里云access_secret:</label>
+            <div class="col-xs-12 col-sm-8">
+                <input type="text" class="form-control" id="aliyun_access_secret" name="row[aliyun_access_secret]" value="{$row.aliyun_access_secret|htmlentities}" placeholder="请输入阿里云access_secret" />
+            </div>
+        </div>
+
+
+        <div class="form-group aliyun_key">
+            <label for="aliyun_oss_bucket" class="control-label  col-xs-12 col-sm-2">阿里云oss-bucket:</label>
+            <div class="col-xs-12 col-sm-8">
+                <input type="text" class="form-control" id="aliyun_oss_bucket" name="row[aliyun_oss_bucket]" value="{$row.aliyun_oss_bucket|htmlentities}" placeholder="如：aliyun" />
+            </div>
+        </div>
+        <div class="form-group aliyun_key" syu>
+            <label for="aliyun_knowledge_id" class="control-label  col-xs-12 col-sm-2">阿里云知识库ID:</label>
+            <div class="col-xs-12 col-sm-8">
+                <input type="text" class="form-control" id="aliyun_knowledge_id" name="row[aliyun_knowledge_id]" value="{$row.aliyun_knowledge_id|htmlentities}" placeholder="如：aliyun" />
+            </div>
+        </div>
+        <div class="form-group aliyun_key">
+            <label for="aliyun_knowledge_kongjian" class="control-label  col-xs-12 col-sm-2">阿里云业务空间ID:</label>
+            <div class="col-xs-12 col-sm-8">
+                <input type="text" class="form-control" id="aliyun_knowledge_kongjian" name="row[aliyun_knowledge_kongjian]" value="{$row.aliyun_knowledge_kongjian|htmlentities}" placeholder="如：llm-" />
+            </div>
+        </div>
+        <div class="form-group aliyun_key">
+            <label for="doubao_bot_id" class="control-label  col-xs-12 col-sm-2">豆包应用ID:</label>
+            <div class="col-xs-12 col-sm-8">
+                <input type="text" class="form-control" id="doubao_bot_id" name="row[doubao_bot_id]" value="{$row.doubao_bot_id|htmlentities}" placeholder="如：bot-xxxxx" />
+            </div>
+        </div>
+
+        
+
+        <div class="form-group not_aliyun_key">
+            <label for="coze_key" class="control-label  col-xs-12 col-sm-2">扣子KEY:</label>
+            <div class="col-xs-12 col-sm-8">
+                <input type="text" class="form-control" id="coze_key" name="row[coze_key]" value="{$row.coze_key|htmlentities}" placeholder="如：xxxxx" />
+            </div>
+        </div>
+        <div class="form-group not_aliyun_key">
+            <label for="coze_work_toutiao" class="control-label  col-xs-12 col-sm-2">扣子爆文工作流id:</label>
+            <div class="col-xs-12 col-sm-8">
+                <input type="text" class="form-control" id="coze_work_toutiao" name="row[coze_work_toutiao]" value="{$row.coze_work_toutiao|htmlentities}" placeholder="如：75xxxxx" />
+            </div>
+        </div>
+        <div class="form-group not_aliyun_key">
+            <label for="coze_work_content" class="control-label  col-xs-12 col-sm-2">扣子文章解析工作流id:</label>
+            <div class="col-xs-12 col-sm-8">
+                <input type="text" class="form-control" id="coze_work_content" name="row[coze_work_content]" value="{$row.coze_work_content|htmlentities}" placeholder="如：75xxxxx" />
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-primary btn-embossed disabled">{:__('OK')}</button>
+            <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+        </div>
+    </div>
+</form>
+
+<script src="__CDN__/user_assets/layui/jquery-3.7.1.js?v={$Think.config.site.version}"></script>
+<script type="text/javascript">
+    $(function(){
+        // 切换方式
+        // $(document).on('change', "input[name='row[is_custom_key]']", function() {
+        //     var selectedValue = $(this).val(); // 获取选中的值
+        //     // 根据选中的值进行逻辑处理
+        //     if (selectedValue === '1') {
+        //         $('.is_custom_key_div').show();
+        //         $('.not_aliyun_key').show();
+        //         $('.aliyun_key').show();
+        //     }else if (selectedValue === '2') {
+        //         $('.is_custom_key_div').show();
+        //         $('.not_aliyun_key').hide();
+        //         $('.aliyun_key').show();
+        //     } else{
+        //         $('.is_custom_key_div').hide();
+        //     }
+        // });
+    })
+</script>

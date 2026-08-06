@@ -30,6 +30,9 @@ class User extends Backend
         if ($this->request->isAjax()) {
             list($where, $sort, $order, $offset, $limit) = $this->buildparams();
 
+            // 去除排序字段的表名前缀（如 user.id => id）
+            $sort = preg_replace('/^\w+\./', '', $sort);
+
             $total = $this->model
                 ->where($where)
                 ->count();

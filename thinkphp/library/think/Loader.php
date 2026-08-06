@@ -502,7 +502,13 @@ class Loader
                 return strtoupper($match[1]);
             }, $name));
         } else {
-            return strtolower(trim(preg_replace("/[A-Z]/", "_\\0", $name), "_"));
+            // 支持多级控制器（如 user.User），逐段转换避免点号后产生多余下划线
+            $parts = explode('.', $name);
+            foreach ($parts as &$part) {
+                $part = strtolower(trim(preg_replace("/[A-Z]/", "_\\0", $part), "_"));
+            }
+            unset($part);
+            return implode('.', $parts);
         }
     }
 

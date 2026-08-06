@@ -1,5 +1,5 @@
 define([], function () {
-    if (typeof Config.upload.storage !== 'undefined' && Config.upload.storage === 'alioss') {
+    if (typeof Config.upload !== 'undefined' && typeof Config.upload.storage !== 'undefined' && Config.upload.storage === 'alioss') {
     require(['upload'], function (Upload) {
         //获取文件MD5值
         var getFileMd5 = function (file, cb) {

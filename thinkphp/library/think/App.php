@@ -342,7 +342,21 @@ class App
         if (!is_file($controllerFile) && is_dir($controllerDir)) {
             // general/config → controller=general.Config, action=index
             $controller = $controller . '.' . Loader::parseName($actionName, 1);
-            $actionName = isset($result[3]) ? strip_tags($result[3]) : $config['default_action'];
+            // 多级控制器时，真正的 action 被路由解析丢弃了（$result 只有 3 段）
+            // 需要从原始 pathinfo 重新解析 action 和额外参数
+            $pathInfo = $request->pathinfo();
+            $pathArr = explode('/', trim($pathInfo, '/'));
+            // 计算多级控制器在 pathinfo 中消费的段数（controller 中 . 的数量 + 1）
+            $controllerSegCount = substr_count($controller, '.') + 1;
+            // action 是控制器段之后的第一个段
+            $actionName = isset($pathArr[$controllerSegCount]) ? strip_tags($pathArr[$controllerSegCount]) : $config['default_action'];
+            // 剩余段作为额外参数（如 ids/1），手动解析为键值对
+            $extraParams = array_slice($pathArr, $controllerSegCount + 1);
+            $routeVar = $request->route() ?: [];
+            for ($i = 0; $i + 1 < count($extraParams); $i += 2) {
+                $routeVar[$extraParams[$i]] = strip_tags($extraParams[$i + 1]);
+            }
+            $request->route($routeVar);
             $actionName = $convert ? strtolower($actionName) : $actionName;
         }
 

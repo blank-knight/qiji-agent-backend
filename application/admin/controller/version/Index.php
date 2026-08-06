@@ -1,6 +1,6 @@
 <?php
 
-namespace app\admin\controller;
+namespace app\admin\controller\version;
 
 use app\common\controller\Backend;
 use app\common\model\Version as VersionModel;
@@ -8,7 +8,7 @@ use app\common\model\Version as VersionModel;
 /**
  * 版本管理
  */
-class Version extends Backend
+class Index extends Backend
 {
     protected $model = null;
 

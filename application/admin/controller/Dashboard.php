@@ -13,6 +13,9 @@ use think\Config;
  */
 class Dashboard extends Backend
 {
+    // 模板自带完整HTML，禁用layout
+    protected $layout = '';
+
     /**
      * 查看
      */

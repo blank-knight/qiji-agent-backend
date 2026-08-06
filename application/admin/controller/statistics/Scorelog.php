@@ -1,13 +1,13 @@
 <?php
 
-namespace app\admin\controller;
+namespace app\admin\controller\statistics;
 
 use app\common\controller\Backend;
 
 /**
  * Token 消耗记录
  */
-class ScoreLog extends Backend
+class Scorelog extends Backend
 {
     protected $model = null;
 

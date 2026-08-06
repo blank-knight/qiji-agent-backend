@@ -25,9 +25,13 @@ class Ajax extends Backend
         $this->request->filter(['trim']);
         $controllername = $this->request->get('controllername', '');
         $this->loadlang($controllername);
-        // 强制输出
-        $langStr = '';
-        return json(\think\Lang::get());
+        $langs = \think\Lang::get();
+        // RequireJS 通过 callback=define 以 JSONP 方式加载，需要 AMD 格式
+        $callback = $this->request->get('callback', '');
+        if ($callback === 'define') {
+            return response($callback . '(' . json_encode($langs) . ');')->header(['Content-Type' => 'application/javascript']);
+        }
+        return json($langs);
     }
 
     /**

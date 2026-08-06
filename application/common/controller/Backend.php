@@ -52,6 +52,12 @@ class Backend extends Controller
     protected $layout = 'default';
 
     /**
+     * 前端JS附加配置（assignconfig使用）
+     * @var array
+     */
+    protected $assignConfig = [];
+
+    /**
      * 关联查询
      * @var bool
      */
@@ -128,9 +134,17 @@ class Backend extends Controller
         $controllername = strtolower($this->request->controller());
         $actionname = strtolower($this->request->action());
 
-        // 定义是否Addtabs请求（用 param 替代 input("addtabs")，后者在 TP5.0 下会异常返回 key 名）
-        $addtabsVal = $this->request->param("addtabs");
-        !defined('IS_ADDTABS') && define('IS_ADDTABS', $addtabsVal ? true : false);
+        // 定义是否Addtabs请求（FastAdmin前端通过 ref=addtabs 或 addtabs=1 标识iframe标签页）
+        // 但刷新页面时URL也会带 ref=addtabs，需用 Sec-Fetch-Dest 头区分顶层导航和iframe
+        $secFetchDest = $this->request->header('sec-fetch-dest');
+        $isIframe = ($secFetchDest === 'iframe');
+        $addtabsVal = ($this->request->param("ref") == 'addtabs' || $this->request->param("addtabs"));
+        // Sec-Fetch-Dest 存在时用它判断；不存在时回退到参数判断
+        if ($secFetchDest !== null) {
+            !defined('IS_ADDTABS') && define('IS_ADDTABS', $isIframe && $addtabsVal);
+        } else {
+            !defined('IS_ADDTABS') && define('IS_ADDTABS', $addtabsVal ? true : false);
+        }
 
         // 定义是否Dialog请求
         $dialogVal = $this->request->param("dialog");
@@ -165,10 +179,13 @@ class Backend extends Controller
 
         // 非选项卡、非弹窗、直接访问后台页面时，重定向到 index/index 主框架（避免裸页面）
         // IS_ADDTABS=true 表示已被 iframe 加载，正常渲染；直接访问才需要包进主框架
+        // 排除免登录接口（如 ajax/lang 由 RequireJS 通过 script 标签加载）
         if (!$this->request->isPost() && !$this->request->isAjax() && !IS_ADDTABS && !IS_DIALOG
+            && !$this->match($this->noNeedLogin)
             && strtolower($controllername) != 'index' && strtolower($actionname) != 'login') {
-            $url = 'index/index';
-            $this->redirect(url($url));
+            // 带上当前页面URL用于刷新后恢复
+            $refUrl = $controllername . ($actionname != 'index' ? '/' . $actionname : '');
+            $this->redirect(url('index/index') . '?ref=' . urlencode($refUrl));
         }
 
         // 语言检测并加载
@@ -200,9 +217,10 @@ class Backend extends Controller
             'moduleurl'       => 'admin.php',
             'controllername'  => $controllername,
             'actionname'      => $actionname,
-            'jsname'          => 'require-' . $modulename,
+            'jsname'          => 'backend/' . str_replace('.', '/', $controllername),
             'termurl'         => '',
             'apiurl'          => '',
+            'referer'         => $this->request->get('ref', ''),
         ], $siteConfig);
         $this->view->assign('site', $site);
 
@@ -211,6 +229,26 @@ class Backend extends Controller
             'site' => $site,
         ];
         $this->view->assign('config', $config);
+
+        // 设置布局模板（仅非AJAX请求，且控制器未禁用layout时）
+        if (!IS_AJAX && $this->layout) {
+            // 合并 assignConfig 到 config 变量
+            if ($this->assignConfig) {
+                $config = array_merge($config, $this->assignConfig);
+                $this->view->assign('config', $config);
+            }
+            $this->view->engine->layout('layout/' . $this->layout);
+        }
+    }
+
+    /**
+     * 向前端JS配置中追加数据（合并到 config 变量）
+     * @param string $name 键名
+     * @param mixed $value 值
+     */
+    public function assignconfig($name, $value = '')
+    {
+        $this->assignConfig[$name] = $value;
     }
 
     /**

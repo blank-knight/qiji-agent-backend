@@ -1,45 +1,50 @@
 <!DOCTYPE html>
-<html>
+<html lang="{$config.language|default='zh-cn'}">
     <head>
-        {include file="common/meta" /}
+        <meta charset="utf-8">
+        <title>{$title|default=''} - {$site.name|default='FastAdmin'}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+        <meta name="renderer" content="webkit">
+        <meta name="referrer" content="never">
+        <meta name="robots" content="noindex, nofollow">
+        <link rel="shortcut icon" href="__CDN__/assets/img/favicon.ico" />
+        <link href="__CDN__/assets/css/backend{$Think.config.app_debug?'':'.min'}.css?v={$site.version|htmlentities}" rel="stylesheet">
+        <link href="__CDN__/assets/css/skins/skin-black-blue.css?v={$site.version|htmlentities}" rel="stylesheet">
+        <!--[if lt IE 9]>
+          <script src="__CDN__/assets/js/html5shiv.js"></script>
+          <script src="__CDN__/assets/js/respond.min.js"></script>
+        <![endif]-->
+        <script type="text/javascript">
+            var require = {
+                config:  {$config|json_encode}
+            };
+        </script>
     </head>
+    <body class="hold-transition skin-black-blue" style="padding-top:50px;">
 
-    <body class="inside-header inside-aside {:defined('IS_DIALOG') && IS_DIALOG ? 'is-dialog' : ''}">
-        <div id="main" role="main">
-            <div class="tab-content tab-addtabs">
-                <div id="content">
-                    <div class="row">
-                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                            <section class="content-header hide">
-                                <h1>
-                                    {:__('Dashboard')}
-                                    <small>{:__('Control panel')}</small>
-                                </h1>
-                            </section>
-                            {if !IS_DIALOG && !$Think.config.fastadmin.multiplenav && $Think.config.fastadmin.breadcrumb}
-                            <!-- RIBBON -->
-                            <div id="ribbon">
-                                <ol class="breadcrumb pull-left">
-                                    {if condition="$auth->check('dashboard')"}
-                                    <li><a href="dashboard" class="addtabsit"><i class="fa fa-dashboard"></i> {:__('Dashboard')}</a></li>
-                                    {/if}
-                                </ol>
-                                <ol class="breadcrumb pull-right">
-                                    {foreach $breadcrumb as $vo}
-                                    <li><a href="javascript:;" data-url="{$vo.url|htmlentities}">{$vo.title|htmlentities}</a></li>
-                                    {/foreach}
-                                </ol>
-                            </div>
-                            <!-- END RIBBON -->
-                            {/if}
-                            <div class="content">
-                                {__CONTENT__}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {include file="common/script" /}
+        {__CONTENT__}
+
+        <script src="__CDN__/assets/js/require.min.js"></script>
+        <script type="text/javascript">
+            require.config({
+                config: {
+                    site: {
+                        name: "{$site.name|default='FastAdmin'}",
+                        version: "{$site.version|default='1.0.0'}",
+                        cdnurl: "{$site.cdnurl|default=''}",
+                        timezone: "{$site.timezone|default='Asia/Shanghai'}",
+                        moduleurl: "{$site.moduleurl|default='admin.php'}",
+                        language: "{$site.language|default='zh-cn'}",
+                        controllername: "{$site.controllername|default='index'}",
+                        actionname: "{$site.actionname|default='index'}",
+                        jsname: "{$site.jsname|default='require-backend'}",
+                        autoupdate: false,
+                        termurl: "{$site.termurl|default=''}",
+                        apiurl: "{$site.apiurl|default=''}"
+                    }
+                }
+            });
+        </script>
+        <script src="__CDN__/assets/js/require-backend{$Think.config.app_debug?'':'.min'}.js?v={$site.version|htmlentities}"></script>
     </body>
 </html>
