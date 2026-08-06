@@ -43,8 +43,36 @@ class Dashboard extends Backend
             'paylist'          => $paylist,
             'createlist'       => $createlist,
             'activeusers'      => Db::name('user')->count(),
+            // 新增统计
+            'article_count'    => Db::name('agent')->count(),
+            'totalkeys'        => $this->safeCount('agent_apikey'),
+            'totaltoken'       => $this->safeSum('user_score_log', 'score', ['score' => ['<', 0]]),
         ]);
 
         return $this->view->fetch();
+    }
+
+    /**
+     * 安全统计表行数（表不存在时返回0）
+     */
+    private function safeCount($table)
+    {
+        try {
+            return Db::name($table)->count();
+        } catch (\Exception $e) {
+            return 0;
+        }
+    }
+
+    /**
+     * 安全求和（表不存在时返回0）
+     */
+    private function safeSum($table, $field, $where = [])
+    {
+        try {
+            return abs(Db::name($table)->where($where)->sum($field));
+        } catch (\Exception $e) {
+            return 0;
+        }
     }
 }

@@ -221,9 +221,10 @@ foreach ($configs as $c) {
     $stmt->execute($c);
 }
 
-// 测试代理
+// 测试代理 (api_key 需 base64 编码存储，与 decryptKey 的 base64_decode 对应)
+$agentKey = base64_encode('sk-agent-key-a');
 $pdo->exec("INSERT INTO fa_agent (id, name, agent_id, admin_id, mobile, score, api_key, is_custom_key, status, createtime, updatetime)
-VALUES (1, '测试代理A', 0, 1, '13800000001', 100000, 'sk-agent-key-a', 1, 'normal', {$now}, {$now})");
+VALUES (1, '测试代理A', 0, 1, '13800000001', 100000, '{$agentKey}', 1, 'normal', {$now}, {$now})");
 
 // 测试邀请码
 $pdo->exec("INSERT INTO fa_agent_invite (id, invite_code, agent_id, max_count, used_count, expiretime, status, createtime, updatetime)
@@ -236,6 +237,48 @@ VALUES (1, '13800138000', '测试用户', '{$hashedPwd}', '', '13800138000', 850
 // 测试版本
 $pdo->exec("INSERT INTO fa_version (id, version, newversion, downloadurl, requireversion, packagesize, enforce, upgradetext, createtime, updatetime, weigh, status)
 VALUES (1, '1.0.0', '1.1.0', 'https://example.com/download/qiji-agent-1.1.0.exe', '1.0.0', '85MB', 0, '1. 新增 Skill Hub\n2. 修复若干bug', {$now}, {$now}, 99, 'normal')");
+
+// ===== 标准 RBAC 表（FastAdmin auth_* 系列，核心 Auth 库依赖） =====
+// 权限分组
+$pdo->exec("CREATE TABLE fa_auth_group (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    pid INTEGER NOT NULL DEFAULT 0,
+    name TEXT NOT NULL DEFAULT '',
+    rules TEXT NOT NULL DEFAULT '',
+    createtime INTEGER DEFAULT NULL,
+    updatetime INTEGER DEFAULT NULL,
+    status TEXT NOT NULL DEFAULT 'normal'
+)");
+// 超级管理员组（rules='*' 拥有全部权限）
+$pdo->exec("INSERT INTO fa_auth_group (id, pid, name, rules, createtime, updatetime, status)
+VALUES (1, 0, '超级管理员', '*', {$now}, {$now}, 'normal')");
+
+// 管理员-分组关联
+$pdo->exec("CREATE TABLE fa_auth_group_access (
+    uid INTEGER NOT NULL,
+    group_id INTEGER NOT NULL
+)");
+$pdo->exec("INSERT INTO fa_auth_group_access (uid, group_id) VALUES (1, 1)");
+
+// 权限规则/菜单（从 fa_admin_rule 复制，补充 menutype/extend 字段）
+$pdo->exec("CREATE TABLE fa_auth_rule (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    pid INTEGER NOT NULL DEFAULT 0,
+    name TEXT NOT NULL DEFAULT '',
+    title TEXT NOT NULL DEFAULT '',
+    icon TEXT NOT NULL DEFAULT '',
+    condition TEXT NOT NULL DEFAULT '',
+    remark TEXT NOT NULL DEFAULT '',
+    ismenu INTEGER NOT NULL DEFAULT 0,
+    menutype TEXT NOT NULL DEFAULT '',
+    extend TEXT NOT NULL DEFAULT '',
+    createtime INTEGER DEFAULT NULL,
+    updatetime INTEGER DEFAULT NULL,
+    weigh INTEGER NOT NULL DEFAULT 0,
+    status TEXT NOT NULL DEFAULT 'normal'
+)");
+$pdo->exec("INSERT INTO fa_auth_rule (pid, name, title, icon, condition, remark, ismenu, menutype, extend, createtime, updatetime, weigh, status)
+SELECT pid, name, title, icon, condition, remark, ismenu, '', '', createtime, updatetime, weigh, status FROM fa_admin_rule");
 
 echo "Done! Database created at: {$dbFile}\n";
 echo "Admin login: admin / 123456\n";

@@ -12,7 +12,7 @@ use think\Loader;
  */
 class Common
 {
-    public function appInit($params)
+    public function app_init($params)
     {
         // 加载公共函数库
         if (is_file(APP_PATH . 'common.php')) {
@@ -20,11 +20,11 @@ class Common
         }
     }
 
-    public function appDispatch($params)
+    public function app_dispatch($params)
     {
     }
 
-    public function moduleInit($params = null)
+    public function module_init($params = null)
     {
         // 设置时区
         $timezone = Config::get('default_timezone');
@@ -48,7 +48,7 @@ class Common
         $this->loadLang();
     }
 
-    public function addonBegin($params)
+    public function addon_begin($params)
     {
     }
 

@@ -49,6 +49,10 @@ class Index extends Backend
         $url = $url && $url != 'login' ? $url : 'index/index';
 
         if ($this->auth->isLogin()) {
+            // 浏览器直接访问时做 HTTP 302 跳转，AJAX 请求返回 JSON
+            if (!$this->request->isAjax()) {
+                $this->redirect(url($url));
+            }
             $this->success(__("You've logged in, do not login again"), $url);
         }
 

@@ -128,11 +128,13 @@ class Backend extends Controller
         $controllername = strtolower($this->request->controller());
         $actionname = strtolower($this->request->action());
 
-        // 定义是否Addtabs请求
-        !defined('IS_ADDTABS') && define('IS_ADDTABS', input("addtabs") ? true : false);
+        // 定义是否Addtabs请求（用 param 替代 input("addtabs")，后者在 TP5.0 下会异常返回 key 名）
+        $addtabsVal = $this->request->param("addtabs");
+        !defined('IS_ADDTABS') && define('IS_ADDTABS', $addtabsVal ? true : false);
 
         // 定义是否Dialog请求
-        !defined('IS_DIALOG') && define('IS_DIALOG', input("dialog") ? true : false);
+        $dialogVal = $this->request->param("dialog");
+        !defined('IS_DIALOG') && define('IS_DIALOG', $dialogVal ? true : false);
 
         // 定义是否AJAX请求
         !defined('IS_AJAX') && define('IS_AJAX', $this->request->isAjax());
@@ -145,7 +147,8 @@ class Backend extends Controller
 
         // 检测是否登录
         if (!$this->auth->isLogin() && !$this->match($this->noNeedLogin)) {
-            $url = $this->request->module() . '.index/login';
+            // 多入口已用 BIND_MODULE 固定模块，URL 不再拼接模块名前缀，否则会被解析为 admin.index 控制器
+            $url = 'index/login';
             if ($this->request->isAjax()) {
                 $this->error(__('Please login first'), $url);
             }
@@ -160,21 +163,54 @@ class Backend extends Controller
             }
         }
 
-        // 非选项卡时重定向
-        if (!$this->request->isPost() && !$this->request->isAjax() && IS_ADDTABS) {
-            $url = $this->request->module() . '.index/index';
+        // 非选项卡、非弹窗、直接访问后台页面时，重定向到 index/index 主框架（避免裸页面）
+        // IS_ADDTABS=true 表示已被 iframe 加载，正常渲染；直接访问才需要包进主框架
+        if (!$this->request->isPost() && !$this->request->isAjax() && !IS_ADDTABS && !IS_DIALOG
+            && strtolower($controllername) != 'index' && strtolower($actionname) != 'login') {
+            $url = 'index/index';
             $this->redirect(url($url));
         }
 
         // 语言检测并加载
         $lang = $this->request->langset();
-        $langDir = APP_PATH . $modulename . '/lang/' . $lang . '/';
-        if (is_dir($langDir)) {
-            Lang::directory($langDir);
-        }
 
-        // 加载通用语言包
+        // 加载通用语言包（顶部栏、侧边栏、公共按钮等通用翻译）
+        $this->loadlang('general');
+        // 加载当前控制器对应的语言包
         $this->loadlang($controllername);
+
+        // 将权限对象、管理员信息及路由信息赋值给模板（FastAdmin 模板依赖 $auth->check() 等）
+        $this->view->assign([
+            'auth'            => $this->auth,
+            'admin'           => \think\Session::get('admin'),
+            'modulename'      => $modulename,
+            'controllername'  => $controllername,
+            'actionname'      => $actionname,
+            'requesturl'      => $modulename . '/' . $controllername . '/' . $actionname,
+        ]);
+
+        // 将前端 require-backend.js 依赖的站点配置赋值给模板
+        $siteConfig = \think\Config::get('site') ?: [];
+        $site = array_merge([
+            'name'            => \think\Config::get('site.name') ?: 'FastAdmin',
+            'version'         => \think\Config::get('site.version') ?: '1.0.0',
+            'cdnurl'          => \think\Config::get('site.cdnurl') ?: '',
+            'timezone'        => \think\Config::get('site.timezone') ?: 'Asia/Shanghai',
+            'language'        => $lang ?: 'zh-cn',
+            'moduleurl'       => 'admin.php',
+            'controllername'  => $controllername,
+            'actionname'      => $actionname,
+            'jsname'          => 'require-' . $modulename,
+            'termurl'         => '',
+            'apiurl'          => '',
+        ], $siteConfig);
+        $this->view->assign('site', $site);
+
+        // RequireJS 前端配置（meta.html 中 {$config|json_encode} 引用）
+        $config = [
+            'site' => $site,
+        ];
+        $this->view->assign('config', $config);
     }
 
     /**
@@ -185,7 +221,10 @@ class Backend extends Controller
     {
         $name = strtolower($name);
         $name = str_replace(['.', '/'], '_', $name);
-        Lang::load(APP_PATH . $this->request->module() . '/lang/' . $this->request->langset() . '/' . str_replace('.', '/', $name) . '.php');
+        // $this->request->langset() 在 TP5.0 下可能为空，回退到配置中的 default_lang
+        $lang = $this->request->langset() ?: \think\Config::get('default_lang') ?: 'zh-cn';
+        $langFile = APP_PATH . $this->request->module() . '/lang/' . $lang . '/' . str_replace('.', '/', $name) . '.php';
+        Lang::load($langFile);
     }
 
     /**
@@ -210,61 +249,89 @@ class Backend extends Controller
     }
 
     /**
-     * 操作成功返回的数据
-     * @param string $msg 提示信息
-     * @param mixed $data 要返回的数据
-     * @param int $code 错误码
-     * @param string $type 输出类型
-     * @param array $header 发送的Header信息
+     * 操作成功返回的数据（FastAdmin 标准签名：msg, url, data）
+     * @param string $msg  提示信息
+     * @param string $url  跳转的URL
+     * @param mixed  $data 返回的数据
+     * @param int    $wait 跳转等待时间
+     * @param array  $header 发送的Header信息
      */
-    protected function success($msg = '', $data = null, $code = 1, $type = null, array $header = [])
+    protected function success($msg = '', $url = null, $data = '', $wait = 3, array $header = [])
     {
-        $this->result($msg, $data, $code, $type, $header);
+        if (is_numeric($msg)) {
+            $code = $msg;
+            $msg = '';
+        } else {
+            $code = 1;
+        }
+        return $this->result($code, $msg, $url, $data, $wait, $header, 'success');
     }
 
     /**
-     * 操作失败返回的数据
-     * @param string $msg 提示信息
-     * @param mixed $data 要返回的数据
-     * @param int $code 错误码
-     * @param string $type 输出类型
-     * @param array $header 发送的Header信息
+     * 操作失败返回的数据（FastAdmin 标准签名：msg, url, data）
+     * @param string $msg  提示信息
+     * @param string $url  跳转的URL
+     * @param mixed  $data 返回的数据
+     * @param int    $wait 跳转等待时间
+     * @param array  $header 发送的Header信息
      */
-    protected function error($msg = '', $data = null, $code = 0, $type = null, array $header = [])
+    protected function error($msg = '', $url = null, $data = '', $wait = 3, array $header = [])
     {
-        $this->result($msg, $data, $code, $type, $header);
+        if (is_numeric($msg)) {
+            $code = $msg;
+            $msg = '';
+        } else {
+            $code = 0;
+        }
+        return $this->result($code, $msg, $url, $data, $wait, $header, 'error');
     }
 
     /**
-     * 返回封装后的 API 数据到客户端
+     * 返回封装后的 API 数据到客户端（FastAdmin 标准：输出 code/msg/data/url/wait）
      * @access protected
-     * @param mixed $msg 提示信息
-     * @param mixed $data 要返回的数据
-     * @param int $code 错误码
-     * @param string $type 输出类型
-     * @param array $header 发送的Header信息
+     * @param int    $code 状态码（1成功 0失败）
+     * @param string $msg  提示信息
+     * @param string $url  跳转URL
+     * @param mixed  $data 返回数据
+     * @param int    $wait 等待时间
+     * @param array  $header 头信息
+     * @param string $type  success/error（用于扩展）
      * @return void
      * @throws HttpResponseException
      */
-    protected function result($msg, $data = null, $code = 0, $type = null, array $header = [])
+    protected function result($code = 0, $msg = '', $url = null, $data = '', $wait = 3, array $header = [], $type = '')
     {
+        // 处理跳转URL
+        if (is_null($url) && isset($_SERVER["HTTP_REFERER"])) {
+            $url = $_SERVER["HTTP_REFERER"];
+        } elseif ($url) {
+            $url = (strpos($url, '://') || 0 === strpos($url, '/')) ? $url : url($url);
+        }
+
         $result = [
-            'code' => $code,
+            'code' => (int)$code,
             'msg'  => $msg,
             'time' => $this->request->server('REQUEST_TIME'),
             'data' => $data,
+            'url'  => (string)$url,
+            'wait' => $wait,
         ];
 
-        $type = $type ? $type : ($this->request->param(config('var_jsonp_handler')) ? 'jsonp' : $this->responseType);
+        $responseType = $this->request->param(config('var_jsonp_handler')) ? 'jsonp' : ($this->responseType ?: 'json');
 
+        // HTTP状态码：成功200，失败500
         if (isset($header['statuscode'])) {
-            $code = $header['statuscode'];
+            $httpCode = $header['statuscode'];
             unset($header['statuscode']);
         } else {
-            $code = $code >= 1 && $code <= 4 ? $code : ($code ? 200 : 500);
+            $httpCode = $code >= 1 ? 200 : 500;
         }
 
-        $response = Response::create($result, $type, $code)->header($header);
+        // 跨域头
+        $header['Access-Control-Allow-Origin'] = '*';
+        $header['Access-Control-Allow-Headers'] = 'X-Requested-With,X_Requested_With,content-type';
+
+        $response = Response::create($result, $responseType, $httpCode)->header($header);
         throw new \think\exception\HttpResponseException($response);
     }
 
@@ -328,7 +395,8 @@ class Backend extends Controller
             // 合并到 where
         }
 
-        $order = $sort && $order ? [$sort => strtolower($order) == 'asc' ? 'ASC' : 'DESC'] : [];
+        // 控制器统一以 order($sort, $order) 方式调用，故 $order 返回排序方向字符串
+        $order = $sort && $order ? (strtolower($order) == 'asc' ? 'ASC' : 'DESC') : 'DESC';
 
         return [$where, $sort, $order, $offset, $limit];
     }

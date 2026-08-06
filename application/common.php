@@ -9,6 +9,19 @@ use think\Cookie;
 use think\Request;
 use think\Response;
 
+// 将 session 保存路径指向项目 runtime（解决 /var/lib/php/sessions 无写权限问题）
+// common.php 在 app_init 行为阶段加载，早于 Session 启动，此时设置 save_path 生效
+if (!defined('RUNTIME_PATH')) {
+    define('RUNTIME_PATH', dirname(__DIR__) . '/runtime/');
+}
+$sessionPath = RUNTIME_PATH . 'session';
+if (!is_dir($sessionPath)) {
+    @mkdir($sessionPath, 0777, true);
+}
+if (is_dir($sessionPath) && is_writable($sessionPath)) {
+    session_save_path($sessionPath);
+}
+
 /**
  * 跨域检测
  */
@@ -264,5 +277,116 @@ if (!function_exists('purify_html')) {
             return $purifier->purify($html);
         }
         return htmlspecialchars($html);
+    }
+}
+
+/**
+ * 包装数据集（FastAdmin 辅助函数）
+ * 将数组或模型查询结果包装为 think\Collection 对象，便于链式调用 toArray 等
+ */
+if (!function_exists('collection')) {
+    function collection($result)
+    {
+        if (is_array($result)) {
+            $result = new \think\Collection($result);
+        }
+        return $result;
+    }
+}
+
+/**
+ * 构建页面标题区块（FastAdmin 辅助函数）
+ * 返回页面顶部的标题与描述 HTML
+ */
+if (!function_exists('build_heading')) {
+    function build_heading($title = null, $content = null, $model = null)
+    {
+        if ($title === null) {
+            $title = Request::instance()->controller();
+            $title = ucwords(str_replace(['_', '.'], ' ', $title));
+        }
+        $html = '';
+        if ($title) {
+            $html .= '<div class="panel-heading"><h3 class="panel-title">' . htmlspecialchars($title) . '</h3></div>';
+        }
+        return $html;
+    }
+}
+
+/**
+ * CDN URL 处理（FastAdmin 辅助函数）
+ */
+if (!function_exists('cdnurl')) {
+    function cdnurl($url, $domain = false)
+    {
+        // 本地资源直接返回，外部链接原样返回
+        if (empty($url) || preg_match('/^((https?:)?\/\/|data:image\/)/i', $url)) {
+            return $url;
+        }
+        $cdn = config('site.cdnurl') ?: '';
+        return rtrim($cdn, '/') . '/' . ltrim($url, '/');
+    }
+}
+
+/**
+ * 构建工具栏按钮（FastAdmin 辅助函数）
+ * 生成列表页的新增/编辑/删除等操作按钮
+ */
+if (!function_exists('build_toolbar')) {
+    function build_toolbar($btns = null, $table = null)
+    {
+        $btns = $btns === null ? ['refresh', 'add', 'edit', 'del', 'import'] : (is_array($btns) ? $btns : explode(',', $btns));
+        $btnAttr = [
+            'refresh' => ['javascript:;', 'btn btn btn-primary btn-refresh', 'fa fa-refresh', ''],
+            'add'     => ['javascript:;', 'btn btn-success btn-add', 'fa fa-plus', __('Add')],
+            'edit'    => ['javascript:;', 'btn btn-success btn-edit btn-disabled disabled', 'fa fa-pencil', __('Edit')],
+            'del'     => ['javascript:;', 'btn btn-danger btn-del btn-disabled disabled', 'fa fa-trash', __('Del')],
+            'import'  => ['javascript:;', 'btn btn-info btn-import', 'fa fa-upload', __('Import')],
+        ];
+        $html = '<div class="toolbar btn-toolbar" style="margin-bottom:10px;">';
+        foreach ($btns as $k => $v) {
+            if (!isset($btnAttr[$v])) continue;
+            list($href, $class, $icon, $text) = $btnAttr[$v];
+            $html .= '<a href="' . $href . '" class="' . $class . '" ><i class="' . $icon . '"></i> ' . $text . '</a> ';
+        }
+        $html .= '</div>';
+        return $html;
+    }
+}
+
+/**
+ * 构建下拉选择框（FastAdmin 辅助函数）
+ */
+if (!function_exists('build_select')) {
+    function build_select($name, $options, $selected = [], $attr = [])
+    {
+        $selected = is_array($selected) ? $selected : explode(',', $selected);
+        $attrStr = '';
+        foreach ($attr as $k => $v) {
+            $attrStr .= ' ' . $k . '="' . htmlspecialchars($v) . '"';
+        }
+        $html = '<select name="' . $name . '"' . $attrStr . '>';
+        foreach ($options as $k => $v) {
+            $isSel = in_array((string)$k, array_map('strval', $selected)) ? ' selected' : '';
+            $html .= '<option value="' . htmlspecialchars($k) . '"' . $isSel . '>' . htmlspecialchars($v) . '</option>';
+        }
+        $html .= '</select>';
+        return $html;
+    }
+}
+
+/**
+ * 生成时间日期（兼容别名）
+ */
+if (!function_exists('build_radios')) {
+    function build_radios($name, $list, $selected = null)
+    {
+        $html = '';
+        $selected = is_null($selected) ? key($list) : $selected;
+        foreach ($list as $k => $v) {
+            $checked = $k == $selected ? ' checked' : '';
+            $html .= '<label><input type="radio" name="' . $name . '" value="' . htmlspecialchars($k) . '"' . $checked . '> ' . htmlspecialchars($v) . '</label> ';
+        }
+        return $html;
     }
 }
