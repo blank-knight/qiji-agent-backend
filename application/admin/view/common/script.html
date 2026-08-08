@@ -1,23 +1,9 @@
 <script src="__CDN__/assets/js/require.min.js"></script>
 <script type="text/javascript">
     // 必须在 require.min.js 加载后、require-backend.js 执行前注入 config.site 配置
-    // require-backend.js 第 2 行即读取 requirejs.s.contexts._.config.config.site.version
     require.config({
         config: {
-            site: {
-                name: "{$site.name|default='FastAdmin'}",
-                version: "{$site.version|default='1.0.0'}",
-                cdnurl: "{$site.cdnurl|default=''}",
-                timezone: "{$site.timezone|default='Asia/Shanghai'}",
-                moduleurl: "{$site.moduleurl|default='admin.php'}",
-                language: "{$site.language|default='zh-cn'}",
-                controllername: "{$site.controllername|default='index'}",
-                actionname: "{$site.actionname|default='index'}",
-                jsname: "{$site.jsname|default='require-backend'}",
-                autoupdate: false,
-                termurl: "{$site.termurl|default=''}",
-                apiurl: "{$site.apiurl|default=''}"
-            }
+            site: {$site|json_encode}
         }
     });
 </script>

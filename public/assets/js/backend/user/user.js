@@ -27,36 +27,14 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                     [
                         {checkbox: true},
                         {field: 'id', title: __('Id'), sortable: true},
-                        {field: 'agent_id', title: '代理id'},
                         {field: 'username', title: __('Username'), operate: 'LIKE'},
-                        {field: 'company_name', title: '公司名', operate: 'LIKE'},
-                        {field: 'score', title: '点数', operate: false},
-                        {field: 'media_money', title: '余额', operate: false},
-                        // {field: 'memory', title: '存储(M)', operate: false},
-                        {field: '', title: '发布', operate: false,formatter: function(value, row, index){
-                            var send_count = row.send_count;
-                            if(row.send_count > 999999){
-                                send_count = '不限';
-                            }
-                            return row.use_send_count+ '/'+send_count;
-                        }},
-                        {field: '', title: '写作', operate: false,formatter: function(value, row, index){
-                            var article_count = row.article_count;
-                            if(row.article_count > 999999){
-                                article_count = '不限';
-                            }
-                            return row.use_article_count+ '/'+article_count;  
-                        }},
-                        // {field: 'mobile', title: __('Mobile'), operate: 'LIKE'},
-                        {field: 'remark', title: '备注', operate: 'LIKE'},
-                        // {field: 'cid', title:'公司标识', operate: 'LIKE'},
-                        {field: 'out_time', title: '到期时间', formatter: Table.api.formatter.date, operate: 'RANGE', addclass: 'datetimerange', sortable: true},
-                        {field: 'avatar', title: __('Avatar'), events: Table.api.events.image, formatter: Table.api.formatter.image, operate: false},
-                        // {field: 'score', title: __('Score'), operate: 'BETWEEN', sortable: true},
+                        {field: 'nickname', title: __('Nickname'), operate: 'LIKE'},
+                        {field: 'agent_name', title: '所属代理', operate: false},
+                        {field: 'mobile', title: __('Mobile'), operate: 'LIKE'},
+                        {field: 'score', title: '积分', operate: 'BETWEEN', sortable: true},
+                        {field: 'email', title: __('Email'), operate: 'LIKE'},
                         {field: 'jointime', title: '注册时间', formatter: Table.api.formatter.datetime, operate: 'RANGE', addclass: 'datetimerange', sortable: true},
-                        {field: '', title: '管理用户',formatter:function (value,row,index){
-                            return '<a style="color:#fff;background:linear-gradient(168deg,#2f48e2,#a63cb6);padding:6px 8px;border-radius: 5px;font-size: 13px;cursor: pointer;width: 70px;text-align: center;margin: 0 auto;" href="../index/user_manage/?id='+row.id+'" target="_blank">进入后台</a>';
-                        }, operate: false},
+                        {field: 'logintime', title: '登录时间', formatter: Table.api.formatter.datetime, operate: 'RANGE', addclass: 'datetimerange', sortable: true},
                         {field: 'status', title: __('Status'), formatter: Table.api.formatter.status, searchList: {normal: __('Normal'), hidden: __('Hidden')}},
                         {field: 'operate', title: __('Operate'), table: table, events: Table.api.events.operate, formatter: Table.api.formatter.operate}
                     ]

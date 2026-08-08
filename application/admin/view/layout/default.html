@@ -28,20 +28,7 @@
         <script type="text/javascript">
             require.config({
                 config: {
-                    site: {
-                        name: "{$site.name|default='FastAdmin'}",
-                        version: "{$site.version|default='1.0.0'}",
-                        cdnurl: "{$site.cdnurl|default=''}",
-                        timezone: "{$site.timezone|default='Asia/Shanghai'}",
-                        moduleurl: "{$site.moduleurl|default='admin.php'}",
-                        language: "{$site.language|default='zh-cn'}",
-                        controllername: "{$site.controllername|default='index'}",
-                        actionname: "{$site.actionname|default='index'}",
-                        jsname: "{$site.jsname|default='require-backend'}",
-                        autoupdate: false,
-                        termurl: "{$site.termurl|default=''}",
-                        apiurl: "{$site.apiurl|default=''}"
-                    }
+                    site: {$site|json_encode}
                 }
             });
         </script>

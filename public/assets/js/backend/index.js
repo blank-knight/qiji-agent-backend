@@ -205,36 +205,22 @@ define(['jquery', 'bootstrap', 'backend', 'addtabs', 'adminlte', 'form'], functi
             }
 
             //这一行需要放在点击左侧链接事件之前
-            var addtabs = Config.referer ? sessionStorage.getItem("addtabs") : null;
+            var addtabs = null;
 
             //绑定tabs事件,如果需要点击强制刷新iframe,则请将iframeForceRefresh置为true,iframeForceRefreshTable只强制刷新表格
             nav.addtabs({iframeHeight: "100%", iframeForceRefresh: false, iframeForceRefreshTable: true, nav: nav});
 
-            if ($("ul.sidebar-menu li.active a").length > 0) {
+            // 如果已有PHP渲染的fixedmenu iframe，只需激活菜单高亮，不重复触发click
+            if ($(".content-wrapper .tab-pane.active iframe").length > 0) {
+                var fixedId = $(".content-wrapper .tab-pane.active").attr("id").replace("con_", "");
+                $(".sidebar-menu li a[addtabs='" + fixedId + "']").parent("li").addClass("active");
+            } else if ($("ul.sidebar-menu li.active a").length > 0) {
                 $("ul.sidebar-menu li.active a").trigger("click");
             } else {
                 if (multiplenav) {
                     $("li:first > a", firstnav).trigger("click");
                 } else {
                     $("ul.sidebar-menu li a[url!='javascript:;']:first").trigger("click");
-                }
-            }
-
-            //如果是刷新操作则直接返回刷新前的页面
-            if (Config.referer) {
-                if (Config.referer === $(addtabs).attr("url")) {
-                    var active = $("ul.sidebar-menu li a[addtabs=" + $(addtabs).attr("addtabs") + "]");
-                    if (multiplenav && active.length == 0) {
-                        active = $("ul li a[addtabs='" + $(addtabs).attr("addtabs") + "']");
-                    }
-                    if (active.length > 0) {
-                        active.trigger("click");
-                    } else {
-                        $(addtabs).appendTo(document.body).addClass("hide").trigger("click");
-                    }
-                } else {
-                    //刷新页面后跳到到刷新前的页面
-                    Backend.api.addtabs(Config.referer);
                 }
             }
 

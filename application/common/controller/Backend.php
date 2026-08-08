@@ -234,8 +234,11 @@ class Backend extends Controller
         if (!IS_AJAX && $this->layout) {
             // 合并 assignConfig 到 config 变量
             if ($this->assignConfig) {
-                $config = array_merge($config, $this->assignConfig);
+                // 将 assignConfig 合并到 site 下，以便前端 window.Config 能访问
+                $site = array_merge($site, $this->assignConfig);
+                $config = ['site' => $site];
                 $this->view->assign('config', $config);
+                $this->view->assign('site', $site);
             }
             $this->view->engine->layout('layout/' . $this->layout);
         }

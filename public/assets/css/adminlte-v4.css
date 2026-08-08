@@ -1,0 +1,628 @@
+/* ============================================
+   AdminLTE v4 风格覆盖层 for FastAdmin
+   精确映射 AdminLTE 2 (FastAdmin) → AdminLTE v4 视觉
+   设计令牌来源：AdminLTE v4.2.0 dist/css/adminlte.css
+   ============================================ */
+
+/* ============================================
+   1. 全局基础
+   ============================================ */
+
+.skin-black-blue,
+.skin-black-blue body {
+    font-family: "Source Sans 3", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+    font-size: 14px;
+}
+
+.skin-black-blue .content-wrapper,
+.skin-black-blue .main-footer {
+    background-color: #f4f6f9 !important;
+}
+
+.skin-black-blue .content {
+    padding: 10px 15px !important;
+}
+
+/* ============================================
+   2. 品牌区 Logo（暗色 #343a40）
+   ============================================ */
+
+.skin-black-blue .main-header .logo {
+    background-color: #343a40 !important;
+    color: rgba(255, 255, 255, .85) !important;
+    border-bottom: 1px solid #495057 !important;
+    transition: width .3s ease-in-out;
+}
+
+.skin-black-blue .main-header .logo:hover {
+    background-color: #343a40 !important;
+    color: #fff !important;
+}
+
+.skin-black-blue .main-header .logo .logo-lg {
+    font-weight: 300;
+}
+
+/* 折叠态 Logo */
+.skin-black-blue.sidebar-mini.sidebar-collapse .main-header .logo {
+    background-color: #343a40 !important;
+}
+
+/* ============================================
+   3. 顶栏导航栏（白色，底部边框）
+   ============================================ */
+
+.skin-black-blue .main-header {
+    background: #fff !important;
+    box-shadow: none !important;
+    border-bottom: 1px solid #dee2e6 !important;
+}
+
+.skin-black-blue .main-header .navbar {
+    background-color: #fff !important;
+    border-bottom: none !important;
+}
+
+.skin-black-blue .main-header .navbar .sidebar-toggle {
+    color: #6c757d !important;
+    background: transparent !important;
+}
+
+.skin-black-blue .main-header .navbar .sidebar-toggle:hover {
+    color: #212529 !important;
+    background: #f8f9fa !important;
+}
+
+.skin-black-blue .main-header .navbar .nav > li > a {
+    color: #6c757d !important;
+}
+
+.skin-black-blue .main-header .navbar .nav > li > a:hover,
+.skin-black-blue .main-header .navbar .nav > li > a:focus,
+.skin-black-blue .main-header .navbar .nav > li > a:active {
+    background-color: #f8f9fa !important;
+    color: #212529 !important;
+}
+
+.skin-black-blue .main-header .navbar .nav > li.open > a,
+.skin-black-blue .main-header .navbar .nav > li.active > a {
+    background-color: #f8f9fa !important;
+    color: #212529 !important;
+}
+
+/* ============================================
+   4. 顶栏 Tab 标签页（AdminLTE v4 风格）
+   ============================================ */
+
+.skin-black-blue #firstnav {
+    border-bottom: 1px solid #dee2e6 !important;
+    box-shadow: none !important;
+}
+
+.skin-black-blue .nav-addtabs > li > a {
+    color: #6c757d !important;
+    border-radius: 0 !important;
+    border-right: 1px solid #f1f4f6 !important;
+}
+
+.skin-black-blue .nav-addtabs > li > a:hover,
+.skin-black-blue .nav-addtabs > li > a:focus {
+    background-color: #f8f9fa !important;
+    color: #212529 !important;
+}
+
+.skin-black-blue .nav-addtabs > li.active > a {
+    background-color: #f8f9fa !important;
+    color: #0d6efd !important;
+    border-bottom: 2px solid #0d6efd !important;
+}
+
+.skin-black-blue .nav-addtabs > li .close-tab {
+    color: #adb5bd !important;
+}
+
+/* ============================================
+   5. 侧边栏（AdminLTE v4 dark 风格）
+   ============================================ */
+
+.skin-black-blue .main-sidebar,
+.skin-black-blue .left-side {
+    background-color: #343a40 !important;
+    box-shadow: none !important;
+}
+
+/* 用户面板 */
+.skin-black-blue .user-panel > .info,
+.skin-black-blue .user-panel > .info > a {
+    color: #c2c7d0 !important;
+}
+
+.skin-black-blue .user-panel > .info > p {
+    color: #c2c7d0 !important;
+    font-weight: 400 !important;
+}
+
+.skin-black-blue .user-panel > .image img {
+    border-radius: 50% !important;
+}
+
+/* 搜索框 */
+.skin-black-blue .sidebar-form input[type="text"] {
+    background: rgba(255, 255, 255, .1) !important;
+    color: #c2c7d0 !important;
+    border: 1px solid transparent !important;
+    border-radius: 4px !important;
+    box-shadow: none !important;
+}
+
+.skin-black-blue .sidebar-form input[type="text"]:focus {
+    background: rgba(255, 255, 255, .15) !important;
+    color: #fff !important;
+    border-color: rgba(255, 255, 255, .2) !important;
+}
+
+.skin-black-blue .sidebar-form input[type="text"]::placeholder {
+    color: #c2c7d0 !important;
+}
+
+.skin-black-blue .sidebar-form .btn {
+    background: transparent !important;
+    color: #c2c7d0 !important;
+    border: none !important;
+}
+
+/* 菜单项容器 */
+.skin-black-blue .sidebar-menu > li {
+    margin: 2px 0 !important;
+}
+
+/* 一级菜单链接 — AdminLTE v4 圆角风格 */
+.skin-black-blue .sidebar-menu > li > a {
+    border-radius: 4px !important;
+    border-left: 0 !important;
+    padding: 8px 12px !important;
+    color: #c2c7d0 !important;
+    font-weight: 400;
+    margin: 0 8px !important;
+    transition: color .3s ease-in-out, background-color .3s ease-in-out;
+}
+
+.skin-black-blue .sidebar-menu > li > a > .fa,
+.skin-black-blue .sidebar-menu > li > a > .glyphicon,
+.skin-black-blue .sidebar-menu > li > a > .ion {
+    width: 20px;
+    text-align: center;
+}
+
+/* 菜单 hover — v4: rgba(255,255,255,.1) + 白字 */
+.skin-black-blue .sidebar-menu > li:hover > a,
+.skin-black-blue .sidebar-menu > li > a:hover {
+    color: #fff !important;
+    background-color: rgba(255, 255, 255, .1) !important;
+    border-left-color: transparent !important;
+}
+
+/* 菜单 active — v4: rgba(255,255,255,.1) + 白字，无左边框 */
+.skin-black-blue .sidebar-menu > li.active > a {
+    color: #fff !important;
+    background-color: rgba(255, 255, 255, .1) !important;
+    border-left-color: transparent !important;
+    font-weight: 400;
+}
+
+/* treeview 展开 */
+.skin-black-blue .sidebar-menu li.treeview > a {
+    background: transparent !important;
+    border-left-color: transparent !important;
+}
+
+.skin-black-blue .sidebar-menu > li.menu-open > a,
+.skin-black-blue .sidebar-menu > li.treeview-open > a {
+    color: #fff !important;
+    background-color: rgba(255, 255, 255, .1) !important;
+}
+
+/* 子菜单 — v4 透明背景 */
+.skin-black-blue .sidebar-menu > li > .treeview-menu {
+    background: transparent !important;
+    padding-left: 0 !important;
+    margin: 0 8px !important;
+}
+
+.skin-black-blue .sidebar-menu .treeview-menu > li {
+    margin: 2px 0 !important;
+}
+
+.skin-black-blue .treeview-menu > li > a {
+    color: #c2c7d0 !important;
+    padding: 7px 12px 7px 32px !important;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.skin-black-blue .treeview-menu > li > a:hover {
+    color: #fff !important;
+    background-color: rgba(255, 255, 255, .1) !important;
+}
+
+.skin-black-blue .treeview-menu > li.active > a {
+    color: #fff !important;
+    background-color: rgba(255, 255, 255, .1) !important;
+}
+
+.skin-black-blue .sidebar-menu .treeview-menu .treeview-menu > li > a {
+    padding-left: 44px !important;
+}
+
+/* ============================================
+   6. 内容标题栏
+   ============================================ */
+
+.skin-black-blue .content-header {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 10px 15px 0 !important;
+}
+
+.skin-black-blue .content-header h1 {
+    font-weight: 400;
+    font-size: 1.5rem;
+}
+
+/* ============================================
+   7. 面板 / 卡片（AdminLTE v4 card 风格）
+   ============================================ */
+
+.skin-black-blue .panel {
+    border: 1px solid #dee2e6 !important;
+    border-radius: 4px !important;
+    box-shadow: none !important;
+    margin-bottom: 15px;
+    background: #fff;
+}
+
+.skin-black-blue .panel-default > .panel-heading,
+.skin-black-blue .panel-heading {
+    background-color: #fff !important;
+    border-bottom: 1px solid #dee2e6 !important;
+    color: #212529 !important;
+    border-radius: 4px 4px 0 0 !important;
+    padding: 12px 15px !important;
+}
+
+.skin-black-blue .panel-title {
+    font-size: 1.1rem !important;
+    font-weight: 400 !important;
+}
+
+.skin-black-blue .panel-body {
+    padding: 15px !important;
+}
+
+/* ============================================
+   8. 表格（AdminLTE v4 风格）
+   ============================================ */
+
+.skin-black-blue .table > thead > tr > th {
+    background-color: #f8f9fa !important;
+    color: #495057 !important;
+    font-weight: 600;
+    font-size: 13px;
+    border-bottom: 1px solid #dee2e6 !important;
+    border-top: none !important;
+    padding: 10px 15px !important;
+}
+
+.skin-black-blue .table > tbody > tr > td {
+    padding: 8px 15px !important;
+    border-top: 1px solid #f1f4f6 !important;
+    vertical-align: middle;
+}
+
+.skin-black-blue .table-hover > tbody > tr:hover {
+    background-color: #f8f9fa !important;
+}
+
+/* ============================================
+   9. 按钮（Bootstrap 5 风格）
+   ============================================ */
+
+.skin-black-blue .btn {
+    border-radius: 4px !important;
+    font-weight: 400;
+    transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out;
+}
+
+.skin-black-blue .btn-primary {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+}
+
+.skin-black-blue .btn-primary:hover {
+    background-color: #0b5ed7 !important;
+    border-color: #0a58ca !important;
+}
+
+.skin-black-blue .btn-success {
+    background-color: #198754 !important;
+    border-color: #198754 !important;
+}
+
+.skin-black-blue .btn-warning {
+    background-color: #ffc107 !important;
+    border-color: #ffc107 !important;
+    color: #212529 !important;
+}
+
+.skin-black-blue .btn-danger {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+}
+
+.skin-black-blue .btn-default {
+    background-color: #f8f9fa !important;
+    border-color: #dee2e6 !important;
+    color: #212529 !important;
+}
+
+.skin-black-blue .btn-default:hover {
+    background-color: #e9ecef !important;
+}
+
+.skin-black-blue .btn-xs {
+    padding: 1px 5px !important;
+    font-size: 12px;
+    border-radius: 3px !important;
+}
+
+.skin-black-blue .btn-sm {
+    padding: 4px 10px !important;
+    font-size: 13px;
+}
+
+/* ============================================
+   10. 表单
+   ============================================ */
+
+.skin-black-blue .form-control {
+    border-radius: 4px !important;
+    border: 1px solid #dee2e6 !important;
+    box-shadow: none !important;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+.skin-black-blue .form-control:focus {
+    border-color: #86b7fe !important;
+    box-shadow: 0 0 0 .2rem rgba(13, 110, 253, .25) !important;
+}
+
+.skin-black-blue select.form-control {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%236c757d' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px !important;
+}
+
+/* ============================================
+   11. 徽章 / 标签
+   ============================================ */
+
+.skin-black-blue .label {
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: .75em;
+    padding: .35em .65em;
+}
+
+.skin-black-blue .label-primary { background-color: #0d6efd; }
+.skin-black-blue .label-success { background-color: #198754; }
+.skin-black-blue .label-warning { background-color: #ffc107; color: #212529; }
+.skin-black-blue .label-danger { background-color: #dc3545; }
+.skin-black-blue .label-info { background-color: #0dcaf0; color: #212529; }
+
+/* ============================================
+   12. 分页
+   ============================================ */
+
+.skin-black-blue .pagination > li > a,
+.skin-black-blue .pagination > li > span {
+    color: #0d6efd !important;
+    border: 1px solid #dee2e6 !important;
+    border-radius: 4px !important;
+    margin: 0 2px;
+    padding: 6px 12px;
+}
+
+.skin-black-blue .pagination > li > a:hover {
+    background-color: #e9ecef !important;
+    border-color: #dee2e6 !important;
+}
+
+.skin-black-blue .pagination > .active > a,
+.skin-black-blue .pagination > .active > a:hover,
+.skin-black-blue .pagination > .active > a:focus,
+.skin-black-blue .pagination > .active > span,
+.skin-black-blue .pagination > .active > span:hover {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+    color: #fff !important;
+}
+
+/* ============================================
+   13. 下拉菜单
+   ============================================ */
+
+.skin-black-blue .dropdown-menu {
+    border: 1px solid #dee2e6 !important;
+    border-radius: 4px !important;
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important;
+    padding: 5px 0 !important;
+    font-size: 14px;
+}
+
+.skin-black-blue .dropdown-menu > li > a {
+    padding: 6px 20px !important;
+    color: #212529 !important;
+    transition: background-color .15s ease-in-out, color .15s ease-in-out;
+}
+
+.skin-black-blue .dropdown-menu > li > a:hover,
+.skin-black-blue .dropdown-menu > li > a:focus {
+    background-color: #0d6efd !important;
+    color: #fff !important;
+}
+
+.skin-black-blue .dropdown-menu > .divider {
+    background-color: #dee2e6 !important;
+    margin: 5px 0 !important;
+}
+
+/* ============================================
+   14. Small Box（Dashboard 统计卡片）
+   ============================================ */
+
+.skin-black-blue .small-box {
+    border-radius: 4px !important;
+    box-shadow: none !important;
+    border: 1px solid rgba(0, 0, 0, .05);
+}
+
+.skin-black-blue .small-box > .inner {
+    padding: 15px;
+}
+
+.skin-black-blue .small-box h3 {
+    font-weight: 400;
+    margin: 0 0 5px;
+}
+
+.skin-black-blue .small-box .icon {
+    opacity: .15;
+}
+
+.skin-black-blue .small-box .small-box-footer {
+    background-color: rgba(0, 0, 0, .1) !important;
+    padding: 5px 0;
+    font-size: 13px;
+}
+
+/* ============================================
+   15. 滚动条（AdminLTE v4 风格）
+   ============================================ */
+
+.skin-black-blue .sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.skin-black-blue .sidebar::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, .2);
+    border-radius: 3px;
+}
+
+.skin-black-blue .sidebar::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #ced4da;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+/* ============================================
+   16. Alert
+   ============================================ */
+
+.skin-black-blue .alert {
+    border-radius: 4px;
+    border: 1px solid transparent;
+    padding: 12px 20px;
+}
+
+.skin-black-blue .alert-success {
+    background-color: #d1e7dd;
+    color: #0f5132;
+    border-color: #badbcc;
+}
+
+.skin-black-blue .alert-danger {
+    background-color: #f8d7da;
+    color: #842029;
+    border-color: #f5c2c7;
+}
+
+.skin-black-blue .alert-warning {
+    background-color: #fff3cd;
+    color: #664d03;
+    border-color: #ffe69c;
+}
+
+.skin-black-blue .alert-info {
+    background-color: #cff4fc;
+    color: #055160;
+    border-color: #b6effb;
+}
+
+/* ============================================
+   17. Layer 弹窗
+   ============================================ */
+
+.layui-layer {
+    border-radius: 4px !important;
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important;
+    border: none !important;
+}
+
+.layui-layer-title {
+    background-color: #fff !important;
+    border-bottom: 1px solid #dee2e6 !important;
+    color: #212529 !important;
+    font-weight: 400;
+    border-radius: 4px 4px 0 0 !important;
+    font-size: 1.1rem;
+}
+
+/* ============================================
+   18. 文本颜色覆盖（主色 #0d6efd）
+   ============================================ */
+
+.skin-black-blue .text-primary,
+.skin-black-blue .text-info-blue {
+    color: #0d6efd !important;
+}
+
+.skin-black-blue .text-success {
+    color: #198754 !important;
+}
+
+.skin-black-blue .text-warning {
+    color: #ffc107 !important;
+}
+
+.skin-black-blue .text-danger {
+    color: #dc3545 !important;
+}
+
+/* ============================================
+   19. 折叠模式适配
+   ============================================ */
+
+.skin-black-blue.sidebar-mini.sidebar-collapse .sidebar-menu > li > a {
+    margin: 0 4px !important;
+    border-radius: 4px !important;
+    text-align: center;
+}
+
+.skin-black-blue.sidebar-mini.sidebar-collapse .sidebar-menu > li:hover > a {
+    background-color: rgba(255, 255, 255, .1) !important;
+    border-left-color: transparent !important;
+}

@@ -35,7 +35,7 @@ class Index extends Backend
         $this->view->assign('menulist', $menulist);
         $this->view->assign('navlist', $navlist);
         $this->view->assign('fixedmenu', $fixedmenu);
-        $this->view->assign('referermenu', $referermenu);
+        $this->view->assign('referermenu', null);
 
         return $this->view->fetch();
     }

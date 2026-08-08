@@ -2,21 +2,62 @@
 <html lang="zh-CN">
 <head>
     {include file="common/meta" /}
+    <!-- ECharts -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
     <style>
         body {padding-top:50px;}
-        .dashboard-stat {margin-bottom:15px;border-radius:4px;overflow:hidden;position:relative;}
-        .dashboard-stat .visual {width:80px;height:80px;display:block;float:left;padding-top:10px;padding-bottom:10px;margin-left:10px;}
-        .dashboard-stat .visual i {font-size:50px;line-height:60px;color:#fff;}
-        .dashboard-stat .details {float:right;padding:15px;text-align:right;}
-        .dashboard-stat .details .number {font-size:28px;font-weight:300;color:#fff;margin-top:5px;}
-        .dashboard-stat .details .desc {font-size:14px;color:#fff;font-weight:300;}
-        .dashboard-stat .more {clear:both;display:block;padding:6px 10px;position:relative;color:#fff;font-size:12px;opacity:0.8;}
+        .stat-box {
+            border-radius: 4px;
+            margin-bottom: 15px;
+            padding: 15px;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-box .stat-icon {
+            position: absolute;
+            right: 15px;
+            bottom: 5px;
+            font-size: 48px;
+            opacity: 0.3;
+        }
+        .stat-box .stat-num {
+            font-size: 28px;
+            font-weight: 300;
+            line-height: 1.2;
+        }
+        .stat-box .stat-label {
+            font-size: 13px;
+            opacity: 0.85;
+            margin-top: 2px;
+        }
+        .stat-box .stat-today {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 6px;
+        }
         .stat-purple {background:#8b55dc;}
         .stat-green {background:#2cbc37;}
         .stat-blue {background:#3db2ff;}
         .stat-orange {background:#f0a020;}
-        .summary-box {background:#fff;border-radius:4px;padding:20px;margin-bottom:15px;box-shadow:0 1px 3px rgba(0,0,0,.08);}
-        .summary-box h4 {margin-top:0;color:#333;font-size:16px;border-bottom:1px solid #eee;padding-bottom:10px;}
+        .stat-red {background:#e74c3c;}
+        .stat-teal {background:#1abc9c;}
+        .chart-card {
+            background: #fff;
+            border-radius: 4px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,.08);
+        }
+        .chart-card h4 {
+            margin: 0 0 15px 0;
+            font-size: 15px;
+            font-weight: 500;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .chart-container {height: 320px;}
     </style>
 </head>
 <body class="inside-header inside-aside">
@@ -29,85 +70,97 @@
                             <h1>{:__('Dashboard')} <small>{:__('Control panel')}</small></h1>
                         </section>
                         <div class="content">
-                            <!-- 统计卡片 -->
+                            <!-- 概览统计 -->
                             <div class="row">
-                                <div class="col-md-3 col-sm-6 col-xs-12">
-                                    <div class="dashboard-stat stat-purple">
-                                        <div class="visual"><i class="fa fa-users"></i></div>
-                                        <div class="details"><span class="number">{$totaluser}</span><span class="desc">企业数</span></div>
-                                        <a class="more" href="javascript:;">企业开户量</a>
+                                <div class="col-md-2 col-sm-4 col-xs-6">
+                                    <div class="stat-box stat-purple">
+                                        <i class="fa fa-users stat-icon"></i>
+                                        <div class="stat-num">{$totaluser}</div>
+                                        <div class="stat-label">总用户数</div>
+                                        <div class="stat-today">今日注册 +{$todayusersignup} | 周新 {$sevendnu}</div>
                                     </div>
                                 </div>
-                                <div class="col-md-3 col-sm-6 col-xs-12">
-                                    <div class="dashboard-stat stat-green">
-                                        <div class="visual"><i class="fa fa-file-text-o"></i></div>
-                                        <div class="details"><span class="number">{$article_count}</span><span class="desc">AI创作文章</span></div>
-                                        <a class="more" href="javascript:;">文章总数</a>
+                                <div class="col-md-2 col-sm-4 col-xs-6">
+                                    <div class="stat-box stat-blue">
+                                        <i class="fa fa-building stat-icon"></i>
+                                        <div class="stat-num">{$article_count}</div>
+                                        <div class="stat-label">代理/企业数</div>
+                                        <div class="stat-today">正常 {$agent_normal} | 禁用 {$agent_hidden}</div>
                                     </div>
                                 </div>
-                                <div class="col-md-3 col-sm-6 col-xs-12">
-                                    <div class="dashboard-stat stat-blue">
-                                        <div class="visual"><i class="fa fa-key"></i></div>
-                                        <div class="details"><span class="number">{$totalkeys}</span><span class="desc">API Key 数</span></div>
-                                        <a class="more" href="javascript:;">密钥总数</a>
+                                <div class="col-md-2 col-sm-4 col-xs-6">
+                                    <div class="stat-box stat-green">
+                                        <i class="fa fa-key stat-icon"></i>
+                                        <div class="stat-num">{$totalkeys}</div>
+                                        <div class="stat-label">API Key 数</div>
+                                        <div class="stat-today">已分配密钥</div>
                                     </div>
                                 </div>
-                                <div class="col-md-3 col-sm-6 col-xs-12">
-                                    <div class="dashboard-stat stat-orange">
-                                        <div class="visual"><i class="fa fa-line-chart"></i></div>
-                                        <div class="details"><span class="number">{$totaltoken}</span><span class="desc">Token 用量</span></div>
-                                        <a class="more" href="javascript:;">总消耗</a>
+                                <div class="col-md-2 col-sm-4 col-xs-6">
+                                    <div class="stat-box stat-orange">
+                                        <i class="fa fa-line-chart stat-icon"></i>
+                                        <div class="stat-num">{$totaltoken}</div>
+                                        <div class="stat-label">Token 总消耗</div>
+                                        <div class="stat-today">今日 {$unsettleorder}</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 col-sm-4 col-xs-6">
+                                    <div class="stat-box stat-teal">
+                                        <i class="fa fa-exchange stat-icon"></i>
+                                        <div class="stat-num">{$totalorder}</div>
+                                        <div class="stat-label">API 请求总数</div>
+                                        <div class="stat-today">今日 {$todayorder} 次</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 col-sm-4 col-xs-6">
+                                    <div class="stat-box stat-red">
+                                        <i class="fa fa-sign-in stat-icon"></i>
+                                        <div class="stat-num">{$todayuserlogin}</div>
+                                        <div class="stat-label">今日活跃</div>
+                                        <div class="stat-today">周活跃 {$sevendau}</div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- 近7天趋势 -->
+                            <!-- 趋势图 -->
                             <div class="row">
-                                <div class="col-md-6 col-xs-12">
-                                    <div class="summary-box">
-                                        <h4><i class="fa fa-bar-chart text-primary"></i> 近7天创建趋势</h4>
-                                        <table class="table table-bordered text-center text-sm">
-                                            <thead><tr><th>日期</th><th>创建数</th><th>付费数</th></tr></thead>
-                                            <tbody>
-                                                {foreach name="createlist" item="vo" key="key"}
-                                                <tr><td>{$key}</td><td>{$vo}</td><td>{$paylist[$key]}</td></tr>
-                                                {/foreach}
-                                            </tbody>
-                                        </table>
+                                <div class="col-md-8 col-xs-12">
+                                    <div class="chart-card">
+                                        <h4><i class="fa fa-area-chart" style="color:#3db2ff;"></i> 近30天 Token 消耗趋势</h4>
+                                        <div id="chart-token" class="chart-container"></div>
                                     </div>
                                 </div>
-                                <div class="col-md-6 col-xs-12">
-                                    <div class="summary-box">
-                                        <h4><i class="fa fa-info-circle text-info"></i> 系统信息</h4>
-                                        <table class="table table-striped text-sm">
-                                            <tr><td width="30%">系统版本</td><td>QIJI Agent v1.0.0</td></tr>
-                                            <tr><td>框架版本</td><td>ThinkPHP 5.0 / FastAdmin</td></tr>
-                                            <tr><td>PHP 版本</td><td>{:phpversion()}</td></tr>
-                                            <tr><td>服务器时间</td><td>{:date('Y-m-d H:i:s')}</td></tr>
-                                            <tr><td>当前管理员</td><td>{$admin.username|default='admin'}</td></tr>
-                                        </table>
+                                <div class="col-md-4 col-xs-12">
+                                    <div class="chart-card">
+                                        <h4><i class="fa fa-pie-chart" style="color:#8b55dc;"></i> 模型使用占比</h4>
+                                        <div id="chart-model" class="chart-container"></div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- 快捷入口 -->
+                            <!-- 用户趋势 + 系统信息 -->
                             <div class="row">
-                                <div class="col-md-12">
-                                    <div class="summary-box">
-                                        <h4><i class="fa fa-th text-success"></i> 快捷入口</h4>
-                                        <div class="row">
-                                            <div class="col-sm-3 col-xs-6 text-center" style="margin-bottom:10px;">
-                                                <a href="agent" class="addtabsit btn btn-default btn-block"><i class="fa fa-users text-primary"></i> 代理管理</a>
-                                            </div>
-                                            <div class="col-sm-3 col-xs-6 text-center" style="margin-bottom:10px;">
-                                                <a href="user" class="addtabsit btn btn-default btn-block"><i class="fa fa-user text-info"></i> 用户管理</a>
-                                            </div>
-                                            <div class="col-sm-3 col-xs-6 text-center" style="margin-bottom:10px;">
-                                                <a href="agent/key" class="addtabsit btn btn-default btn-block"><i class="fa fa-key text-warning"></i> API Key</a>
-                                            </div>
-                                            <div class="col-sm-3 col-xs-6 text-center" style="margin-bottom:10px;">
-                                                <a href="general/config" class="addtabsit btn btn-default btn-block"><i class="fa fa-cogs text-danger"></i> 系统配置</a>
-                                            </div>
+                                <div class="col-md-8 col-xs-12">
+                                    <div class="chart-card">
+                                        <h4><i class="fa fa-user-plus" style="color:#2cbc37;"></i> 近30天用户增长趋势</h4>
+                                        <div id="chart-user" class="chart-container"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-xs-12">
+                                    <div class="chart-card">
+                                        <h4><i class="fa fa-info-circle" style="color:#f0a020;"></i> 系统信息</h4>
+                                        <table class="table table-condensed" style="margin-bottom:0;">
+                                            <tr><td width="40%" style="color:#999;border:none;">系统版本</td><td style="border:none;font-weight:500;">QIJI Agent v1.0.0</td></tr>
+                                            <tr><td style="color:#999;">框架版本</td><td style="font-weight:500;">ThinkPHP 5.0 / FastAdmin</td></tr>
+                                            <tr><td style="color:#999;">PHP 版本</td><td style="font-weight:500;">{:phpversion()}</td></tr>
+                                            <tr><td style="color:#999;">服务器时间</td><td style="font-weight:500;">{:date('Y-m-d H:i:s')}</td></tr>
+                                            <tr><td style="color:#999;">当前管理员</td><td style="font-weight:500;">{$admin.nickname|default=$admin.username|default='admin'}</td></tr>
+                                        </table>
+                                        <div style="margin-top:15px;">
+                                            <a href="agent" class="addtabsit btn btn-default btn-sm"><i class="fa fa-users text-primary"></i> 代理管理</a>
+                                            <a href="user" class="addtabsit btn btn-default btn-sm"><i class="fa fa-user text-info"></i> 用户管理</a>
+                                            <a href="statistics/scorelog" class="addtabsit btn btn-default btn-sm"><i class="fa fa-bar-chart text-success"></i> 消费记录</a>
+                                            <a href="general/config" class="addtabsit btn btn-default btn-sm"><i class="fa fa-cogs text-danger"></i> 配置</a>
                                         </div>
                                     </div>
                                 </div>
@@ -118,6 +171,99 @@
             </div>
         </div>
     </div>
+
     {include file="common/script" /}
+
+    <script>
+    (function () {
+        var chartDates = {$chart_dates};
+        var chartToken = {$chart_token_trend};
+        var chartUser = {$chart_user_trend};
+        var chartModels = {$chart_models};
+        var chartModelCounts = {$chart_model_counts};
+
+        // 1. Token 消耗趋势（面积折线图）
+        var tokenChart = echarts.init(document.getElementById('chart-token'));
+        tokenChart.setOption({
+            tooltip: { trigger: 'axis' },
+            grid: { left: 60, right: 20, top: 30, bottom: 60 },
+            xAxis: {
+                type: 'category',
+                data: chartDates,
+                axisLabel: { rotate: 0, fontSize: 11, interval: 1 }
+            },
+            yAxis: { type: 'value', name: 'Token', splitNumber: 4 },
+            dataZoom: [{ type: 'inside' }, { type: 'slider', height: 20, bottom: 10 }],
+            series: [{
+                name: 'Token消耗',
+                type: 'line',
+                smooth: true,
+                data: chartToken,
+                areaStyle: { color: 'rgba(61,178,255,0.2)' },
+                lineStyle: { width: 2, color: '#3db2ff' },
+                itemStyle: { color: '#3db2ff' }
+            }]
+        });
+
+        // 2. 模型使用占比（环形饼图）
+        var modelData = [];
+        for (var i = 0; i < chartModels.length; i++) {
+            modelData.push({ name: chartModels[i], value: chartModelCounts[i] });
+        }
+        var modelChart = echarts.init(document.getElementById('chart-model'));
+        modelChart.setOption({
+            tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
+            legend: {
+                orient: 'horizontal',
+                bottom: 0,
+                textStyle: { fontSize: 11 }
+            },
+            color: ['#8b55dc','#3db2ff','#2cbc37','#f0a020','#e74c3c','#1abc9c','#9b59b6','#34495e','#e67e22','#95a5a6'],
+            series: [{
+                type: 'pie',
+                radius: ['40%', '65%'],
+                center: ['50%', '45%'],
+                avoidLabelOverlap: true,
+                label: { show: false },
+                emphasis: {
+                    label: { show: true, fontSize: 14, fontWeight: 'bold' }
+                },
+                data: modelData.length > 0 ? modelData : [{ name: '暂无数据', value: 1 }]
+            }]
+        });
+
+        // 3. 用户增长趋势（柱状图）
+        var userChart = echarts.init(document.getElementById('chart-user'));
+        userChart.setOption({
+            tooltip: { trigger: 'axis' },
+            grid: { left: 60, right: 20, top: 30, bottom: 60 },
+            xAxis: {
+                type: 'category',
+                data: chartDates,
+                axisLabel: { rotate: 0, fontSize: 11, interval: 1 }
+            },
+            yAxis: { type: 'value', name: '新增用户', minInterval: 1, splitNumber: 4 },
+            dataZoom: [{ type: 'inside' }, { type: 'slider', height: 20, bottom: 10 }],
+            series: [{
+                name: '新增用户',
+                type: 'bar',
+                data: chartUser,
+                barWidth: '60%',
+                itemStyle: {
+                    color: function(params) {
+                        return params.value > 0 ? '#2cbc37' : '#e0e0e0';
+                    }
+                }
+            }]
+        });
+
+        // 响应式
+        window.addEventListener('resize', function () {
+            tokenChart.resize();
+            modelChart.resize();
+            userChart.resize();
+        });
+    })();
+    </script>
 </body>
 </html>
