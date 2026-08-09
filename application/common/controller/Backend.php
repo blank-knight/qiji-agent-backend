@@ -134,21 +134,16 @@ class Backend extends Controller
         $controllername = strtolower($this->request->controller());
         $actionname = strtolower($this->request->action());
 
-        // 定义是否Addtabs请求（FastAdmin前端通过 ref=addtabs 或 addtabs=1 标识iframe标签页）
-        // 但刷新页面时URL也会带 ref=addtabs，需用 Sec-Fetch-Dest 头区分顶层导航和iframe
-        $secFetchDest = $this->request->header('sec-fetch-dest');
-        $isIframe = ($secFetchDest === 'iframe');
-        $addtabsVal = ($this->request->param("ref") == 'addtabs' || $this->request->param("addtabs"));
-        // Sec-Fetch-Dest 存在时用它判断；不存在时回退到参数判断
-        if ($secFetchDest !== null) {
-            !defined('IS_ADDTABS') && define('IS_ADDTABS', $isIframe && $addtabsVal);
-        } else {
-            !defined('IS_ADDTABS') && define('IS_ADDTABS', $addtabsVal ? true : false);
-        }
+        // 定义是否Addtabs请求
+        // 必须同时满足：URL带addtabs参数 + 实际来自iframe请求（Sec-Fetch-Dest）
+        // 这样浏览器F5刷新时（即使URL带addtabs=1）也会被重定向到主框架
+        $addtabsParam = ($this->request->param("ref") == 'addtabs' || $this->request->param("addtabs"));
+        $isIframe = $this->request->server('HTTP_SEC_FETCH_DEST') === 'iframe';
+        !defined('IS_ADDTABS') && define('IS_ADDTABS', ($addtabsParam && $isIframe) ? true : false);
 
-        // 定义是否Dialog请求
-        $dialogVal = $this->request->param("dialog");
-        !defined('IS_DIALOG') && define('IS_DIALOG', $dialogVal ? true : false);
+        // 定义是否Dialog请求（同样需要实际来自iframe）
+        $dialogParam = $this->request->param("dialog");
+        !defined('IS_DIALOG') && define('IS_DIALOG', ($dialogParam && $isIframe) ? true : false);
 
         // 定义是否AJAX请求
         !defined('IS_AJAX') && define('IS_AJAX', $this->request->isAjax());
@@ -225,6 +220,19 @@ class Backend extends Controller
         $this->view->assign('site', $site);
 
         // RequireJS 前端配置（meta.html 中 {$config|json_encode} 引用）
+        // upload 配置必须放在 site 内部，因为 require-backend.min.js 中 window.Config = config.site
+        $uploadConfig = [
+            'cdnurl'    => '',
+            'uploadurl' => 'ajax/upload',
+            'bucket'    => 'local',
+            'maxsize'   => '10mb',
+            'mimetype'  => 'jpg,png,bmp,jpeg,gif',
+            'chunking'  => false,
+            'multipart' => [],
+            'multiple'  => false,
+            'storage'   => 'local',
+        ];
+        $site['upload'] = $uploadConfig;
         $config = [
             'site' => $site,
         ];
@@ -390,6 +398,9 @@ class Backend extends Controller
         $search = trim($this->request->get('search', ''));
         $filter = $this->request->get('filter', '');
         $op = $this->request->get('op', '');
+        // 修复 HTML 实体编码导致 json_decode 失败
+        $filter = is_string($filter) ? htmlspecialchars_decode($filter) : $filter;
+        $op = is_string($op) ? htmlspecialchars_decode($op) : $op;
         $sort = $this->request->get('sort', 'id');
         $order = $this->request->get('order', 'DESC');
         $offset = $this->request->get('offset/d', 0);
@@ -402,38 +413,38 @@ class Backend extends Controller
         $op = $op ? $op : [];
         $sort = $sort ? str_replace(',', ' ', $sort) : 'id';
 
-        $params = [];
+        $where = [];
         foreach ($filter as $k => $v) {
             if (!preg_match('/^\w+$/', $k)) {
                 continue;
             }
-            $sym = isset($op[$k]) ? $op[$k] : '=';
-            if (in_array($sym, ['=', '<>', '>', '>=', '<', '<=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN'])) {
-                $params[$k] = $v;
+            $sym = isset($op[$k]) ? strtoupper($op[$k]) : '=';
+            switch ($sym) {
+                case 'LIKE':
+                case 'NOT LIKE':
+                    $where[$k] = [$sym, '%' . $v . '%'];
+                    break;
+                case 'IN':
+                case 'NOT IN':
+                    $where[$k] = [$sym, is_array($v) ? $v : explode(',', $v)];
+                    break;
+                case 'RANGE':
+                case 'BETWEEN':
+                    $valArr = is_array($v) ? $v : explode(',', $v);
+                    if (count($valArr) == 2) {
+                        $where[$k] = ['between', $valArr];
+                    }
+                    break;
+                case '=':
+                case '<>':
+                case '>':
+                case '>=':
+                case '<':
+                case '<=':
+                default:
+                    $where[$k] = [$sym, $v];
+                    break;
             }
-        }
-
-        $where = [];
-        foreach ($params as $k => $v) {
-            $op = isset($op[$k]) ? $op[$k] : '=';
-            $sym = $op;
-            if ($sym == 'LIKE' || $sym == 'NOT LIKE') {
-                $where[$k] = [$sym, '%' . $v . '%'];
-            } elseif ($sym == 'IN' || $sym == 'NOT IN') {
-                $where[$k] = [$sym, is_array($v) ? $v : explode(',', $v)];
-            } else {
-                $where[$k] = [$sym, $v];
-            }
-        }
-
-        // 快速搜索
-        if ($search) {
-            $searchArr = is_array($searchfields) ? $searchfields : explode(',', $searchfields);
-            $searchWhere = [];
-            foreach ($searchArr as $field) {
-                $searchWhere[] = [$field, 'LIKE', '%' . $search . '%'];
-            }
-            // 合并到 where
         }
 
         // 控制器统一以 order($sort, $order) 方式调用，故 $order 返回排序方向字符串

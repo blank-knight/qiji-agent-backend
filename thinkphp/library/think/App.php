@@ -251,7 +251,9 @@ class App
             $params = $reflect->getParameters();
             foreach ($params as $param) {
                 $name  = $param->getName();
-                $class = $param->getClass();
+                // PHP 8.0+ 兼容：getType() 替代已弃用的 getClass()
+                $type  = $param->getType();
+                $class = $type && !$type->isBuiltin() ? new \ReflectionClass($type->getName()) : null;
                 if ($class) {
                     $className = $class->getName();
                     if (isset($vars[$name]) && $vars[$name] instanceof $className) {

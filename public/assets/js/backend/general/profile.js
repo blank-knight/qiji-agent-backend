@@ -41,6 +41,8 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form', 'upload'], function (
             $("#faupload-avatar").data("upload-success", function (data) {
                 var url = Backend.api.cdnurl(data.url);
                 $(".profile-user-img").prop("src", url);
+                // 同步更新父窗口侧边栏头像
+                top.window.$(".user-panel .image img,.user-menu > a > img,.user-header > img").prop("src", url);
                 Toastr.success("上传成功！");
             });
 

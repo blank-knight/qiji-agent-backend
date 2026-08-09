@@ -88,9 +88,17 @@ class Auth extends Api
             }
 
             $userInfo = $this->buildUserInfo($auth->getUser());
+            // 解析 API Key（层级继承）
+            $apiKeyInfo = $this->resolveApiKey($auth->getUser());
             $this->success('注册成功', [
-                'token'     => $auth->getToken(),
-                'user_info' => $userInfo,
+                'token'         => $auth->getToken(),
+                'user_id'       => $userInfo['id'],
+                'username'      => $userInfo['username'],
+                'api_key'       => $apiKeyInfo['api_key'],
+                'is_custom_key' => $userInfo['is_custom_key'],
+                'score'         => $userInfo['score'],
+                'mode'          => $userInfo['mode'],
+                'user_info'     => $userInfo,
             ]);
         } else {
             $this->error($auth->getError() ?: '注册失败');
@@ -103,7 +111,8 @@ class Auth extends Api
      */
     public function login()
     {
-        $mobile   = $this->request->post('mobile', '');
+        // 客户端发 username（手机号），兼容 mobile 字段
+        $mobile   = $this->request->post('mobile', $this->request->post('username', ''));
         $password = $this->request->post('password', '');
 
         if (!$mobile || !$password) {
@@ -115,9 +124,17 @@ class Auth extends Api
 
         if ($ret) {
             $userInfo = $this->buildUserInfo($auth->getUser());
+            // 解析 API Key（层级继承）
+            $apiKeyInfo = $this->resolveApiKey($auth->getUser());
             $this->success('登录成功', [
-                'token'     => $auth->getToken(),
-                'user_info' => $userInfo,
+                'token'         => $auth->getToken(),
+                'user_id'       => $userInfo['id'],
+                'username'      => $userInfo['username'],
+                'api_key'       => $apiKeyInfo['api_key'],
+                'is_custom_key' => $userInfo['is_custom_key'],
+                'score'         => $userInfo['score'],
+                'mode'          => $userInfo['mode'],
+                'user_info'     => $userInfo,
             ]);
         } else {
             $this->error($auth->getError() ?: '登录失败');
@@ -193,5 +210,40 @@ class Auth extends Api
             'is_custom_key' => (int)$user->is_custom_key,
             'agent_name'    => $agentName,
         ];
+    }
+
+    /**
+     * 解析 API Key（层级继承：用户自定义 → 代理 → 贴牌 → 系统）
+     */
+    private function resolveApiKey($user)
+    {
+        $apiKey    = '';
+        $keySource = 'system';
+
+        if ($user->is_custom_key && $user->api_key_encrypted) {
+            $apiKey    = base64_decode($user->api_key_encrypted);
+            $keySource = 'user';
+        } elseif ($user->agent_id) {
+            $agent = Db::name('agent')->where('id', $user->agent_id)->find();
+            if ($agent) {
+                if (!empty($agent['api_key'])) {
+                    $apiKey    = base64_decode($agent['api_key']);
+                    $keySource = 'agent';
+                }
+                if (!$apiKey && !empty($agent['agent_id'])) {
+                    $parent = Db::name('agent')->where('id', $agent['agent_id'])->find();
+                    if ($parent && !empty($parent['api_key'])) {
+                        $apiKey    = base64_decode($parent['api_key']);
+                        $keySource = 'tiepai';
+                    }
+                }
+            }
+        }
+
+        if (!$apiKey) {
+            $apiKey = config('site.default_api_key') ?: '';
+        }
+
+        return ['api_key' => $apiKey, 'key_source' => $keySource];
     }
 }

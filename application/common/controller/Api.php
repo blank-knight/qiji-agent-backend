@@ -68,6 +68,19 @@ class Api extends \think\Controller
         //跨域请求检测
         check_cors_request();
 
+        // 解析 JSON body（客户端用 Content-Type: application/json 发送数据）
+        $contentType = $this->request->server('HTTP_CONTENT_TYPE', '');
+        if (stripos($contentType, 'application/json') !== false) {
+            $rawBody = file_get_contents('php://input');
+            if ($rawBody) {
+                $jsonData = json_decode($rawBody, true);
+                if (is_array($jsonData)) {
+                    $_POST = array_merge($_POST, $jsonData);
+                    $this->request->post($_POST);
+                }
+            }
+        }
+
         //初始化 Auth
         $this->auth = Auth::instance();
 
@@ -173,9 +186,11 @@ class Api extends \think\Controller
         if (isset($header['statuscode'])) {
             $code = $header['statuscode'];
             unset($header['statuscode']);
+        } elseif ($code === 401) {
+            //未登录：HTTP 状态码也设为 401，客户端据此触发登录跳转
         } else {
-            //未设置状态码,根据code值判断
-            $code = $code >= 1 && $code <= 4 ? $code : ($code ? 200 : 500);
+            //其他情况：HTTP 200，业务状态码放在 JSON body 的 code 字段中
+            $code = 200;
         }
 
         $response = Response::create($result, $type, $code)->header($header);

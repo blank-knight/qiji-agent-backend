@@ -10,6 +10,7 @@
         <link rel="shortcut icon" href="__CDN__/assets/img/favicon.ico" />
         <link href="__CDN__/assets/css/backend{$Think.config.app_debug?'':'.min'}.css?v={$site.version|htmlentities}" rel="stylesheet">
         <link href="__CDN__/assets/css/skins/skin-black-blue.css?v={$site.version|htmlentities}" rel="stylesheet">
+        <!-- <link href="__CDN__/assets/css/adminlte-v4.css?v={$site.version|htmlentities}" rel="stylesheet"> -->
         <!--[if lt IE 9]>
           <script src="__CDN__/assets/js/html5shiv.js"></script>
           <script src="__CDN__/assets/js/respond.min.js"></script>
@@ -20,7 +21,7 @@
             };
         </script>
     </head>
-    <body class="hold-transition skin-black-blue" style="padding-top:50px;">
+    <body class="hold-transition skin-black-blue {:input('dialog') && $Think.server.HTTP_SEC_FETCH_DEST=='iframe'?'is-dialog':''}" style="padding-top:50px;">
 
         {__CONTENT__}
 

@@ -45,7 +45,6 @@ class Ajax extends Backend
                 \think\Cache::clear();
                 break;
             case 'template':
-                // 清除模板缓存
                 $tempFiles = glob(\think\Config::get('template.compiled_path') . '*');
                 foreach ($tempFiles as $file) {
                     if (is_file($file)) {
@@ -54,7 +53,6 @@ class Ajax extends Backend
                 }
                 break;
             case 'addons':
-                // 清除插件缓存
                 break;
             case 'all':
             default:
@@ -73,11 +71,52 @@ class Ajax extends Backend
     }
 
     /**
+     * 通用文件上传
+     */
+    public function upload()
+    {
+        $file = $this->request->file('file');
+        if (!$file) {
+            $this->error(__('No file choose'));
+        }
+
+        $uploadDir = ROOT_PATH . 'public' . DS . 'uploads';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+
+        $info = $file->validate(['size' => 10485760, 'ext' => 'jpg,jpeg,png,gif,bmp'])
+            ->move($uploadDir);
+
+        if ($info) {
+            $fileName = $info->getSaveName();
+            $url = '/uploads/' . str_replace('\\', '/', $fileName);
+
+            Db::name('attachment')->insert([
+                'admin_id'   => $this->auth->id,
+                'url'        => $url,
+                'filename'   => $info->getFilename(),
+                'filesize'   => $info->getSize(),
+                'mimetype'   => $info->getMime(),
+                'extension'  => strtolower($info->getExtension()),
+                'uploadtime' => time(),
+                'storage'    => 'local',
+            ]);
+
+            $this->success(__('Upload successful'), null, [
+                'url'     => $url,
+                'fullurl' => $url,
+            ]);
+        } else {
+            $this->error($file->getError());
+        }
+    }
+
+    /**
      * 通用排序
      */
     public function weigh()
     {
-        // 排序的字段名
         $ids = $this->request->post('ids');
         $changeids = $this->request->post('changeids');
 

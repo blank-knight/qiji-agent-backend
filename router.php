@@ -58,5 +58,11 @@ if (in_array($ext, $staticExts)) {
     return true;
 }
 
-// 其余请求交给 ThinkPHP 入口
+// /api/ 开头的请求走 index.php（前台/API入口，不绑定模块）
+if (preg_match('#^/api/#i', $uri)) {
+    require __DIR__ . '/index.php';
+    return;
+}
+
+// 其余请求交给后台入口
 require __DIR__ . '/admin.php';

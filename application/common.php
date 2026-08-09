@@ -346,19 +346,28 @@ if (!function_exists('cdnurl')) {
 if (!function_exists('build_toolbar')) {
     function build_toolbar($btns = null, $table = null)
     {
-        $btns = $btns === null ? ['refresh', 'add', 'edit', 'del', 'import'] : (is_array($btns) ? $btns : explode(',', $btns));
+        $btns = $btns === null ? ['refresh', 'add', 'edit', 'del', 'import', 'commonsearch'] : (is_array($btns) ? $btns : explode(',', $btns));
+        // 自动追加 commonsearch 按钮到所有列表
+        if (!in_array('commonsearch', $btns)) {
+            $btns[] = 'commonsearch';
+        }
         $btnAttr = [
-            'refresh' => ['javascript:;', 'btn btn btn-primary btn-refresh', 'fa fa-refresh', ''],
-            'add'     => ['javascript:;', 'btn btn-success btn-add', 'fa fa-plus', __('Add')],
-            'edit'    => ['javascript:;', 'btn btn-success btn-edit btn-disabled disabled', 'fa fa-pencil', __('Edit')],
-            'del'     => ['javascript:;', 'btn btn-danger btn-del btn-disabled disabled', 'fa fa-trash', __('Del')],
-            'import'  => ['javascript:;', 'btn btn-info btn-import', 'fa fa-upload', __('Import')],
+            'refresh'      => ['javascript:;', 'btn btn btn-primary btn-refresh', 'fa fa-refresh', ''],
+            'add'          => ['javascript:;', 'btn btn-success btn-add', 'fa fa-plus', __('Add')],
+            'edit'         => ['javascript:;', 'btn btn-success btn-edit btn-disabled disabled', 'fa fa-pencil', __('Edit')],
+            'del'          => ['javascript:;', 'btn btn-danger btn-del btn-disabled disabled', 'fa fa-trash', __('Del')],
+            'import'       => ['javascript:;', 'btn btn-info btn-import', 'fa fa-upload', __('Import')],
+            'commonsearch' => ['javascript:;', 'btn btn-success btn-commonsearch', 'fa fa-search', __('Search')],
         ];
         $html = '<div class="toolbar btn-toolbar" style="margin-bottom:10px;">';
         foreach ($btns as $k => $v) {
             if (!isset($btnAttr[$v])) continue;
             list($href, $class, $icon, $text) = $btnAttr[$v];
-            $html .= '<a href="' . $href . '" class="' . $class . '" ><i class="' . $icon . '"></i> ' . $text . '</a> ';
+            $extra = '';
+            if ($v === 'commonsearch') {
+                $extra = ' onclick="jQuery(this).closest(\'.panel-intro\').find(\'.commonsearch-table\').toggleClass(\'hidden\');"';
+            }
+            $html .= '<a href="' . $href . '" class="' . $class . '"' . $extra . '><i class="' . $icon . '"></i> ' . $text . '</a> ';
         }
         $html .= '</div>';
         return $html;
