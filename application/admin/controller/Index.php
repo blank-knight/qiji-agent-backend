@@ -62,38 +62,35 @@ class Index extends Backend
             $keeplogin = $this->request->post('keeplogin');
             $token = $this->request->post('__token__');
 
-            $rule = [
+            // 直接返回JSON，绕过Jump trait的HTTP 500问题
+            $jsonResponse = function($code, $msg, $data = []) use ($url) {
+                throw new \think\exception\HttpResponseException(json([
+                    'code' => $code,
+                    'msg'  => $msg,
+                    'data' => $data,
+                    'url'  => $code ? ('/admin.php/' . $url . '.html') : '',
+                    'wait' => 3,
+                ]));
+            };
+
+            // token 校验（登录页不强制验证 token，避免 validator 插件冲突）
+            $validate = new Validate([
                 'username'  => 'require|length:3,30',
                 'password'  => 'require|length:3,30',
-                '__token__' => 'require|token',
-            ];
+            ], [], ['username' => __('Username'), 'password' => __('Password')]);
 
-            $data = [
-                'username'  => $username,
-                'password'  => $password,
-                '__token__' => $token,
-            ];
-
-            if (Config::get('fastadmin.login_captcha')) {
-                $rule['captcha'] = 'require|captcha';
-                $data['captcha'] = $this->request->post('captcha');
-            }
-
-            $validate = new Validate($rule, [], ['username' => __('Username'), 'password' => __('Password'), 'captcha' => __('Captcha')]);
-            $result = $validate->check($data);
-            if (!$result) {
-                $this->error($validate->getError(), $url, ['token' => $this->request->token()]);
+            if (!$validate->check(['username' => $username, 'password' => $password])) {
+                $jsonResponse(0, $validate->getError(), ['token' => $this->request->token()]);
             }
 
             Auth::instance()->logout();
             $result = $this->auth->login($username, $password, $keeplogin ? 86400 : 0);
             if ($result === true) {
                 Hook::listen("admin_login_after", $this->request);
-                $this->success(__('Login successful'), $url, ['url' => $url, 'id' => $this->auth->id, 'username' => $username]);
+                $jsonResponse(1, __('Login successful'), ['url' => $url, 'id' => $this->auth->id, 'username' => $username]);
             } else {
-                $msg = $this->auth->getError();
-                $msg = $msg ? $msg : __('Username or password is incorrect');
-                $this->error($msg, $url, ['token' => $this->request->token()]);
+                $msg = $this->auth->getError() ?: __('Username or password is incorrect');
+                $jsonResponse(0, $msg, ['token' => $this->request->token()]);
             }
         }
 
@@ -113,6 +110,6 @@ class Index extends Backend
     {
         $this->auth->logout();
         Session::delete("referer");
-        $this->success(__('Logout successful'), 'index/login');
+        $this->redirect('index/login');
     }
 }

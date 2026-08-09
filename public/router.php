@@ -6,26 +6,34 @@
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $uri = urldecode($uri);
 
-// 静态资源直接返回
-if ($uri !== '/' && preg_match('/\.(css|js|jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf|eot|map|html?)$/i', $uri)) {
-    $file = __DIR__ . $uri;
-    if (file_exists($file)) {
-        return false;
-    }
-}
-
 // 处理多入口: /admin.php/xxx, /agent.php/xxx, /index.php/xxx
+// 必须在静态资源检查之前处理，否则 /admin.php/controller/action.html 会被误判为静态文件
 $entryPoints = ['index.php', 'admin.php', 'agent.php'];
+$matchedEntry = null;
 foreach ($entryPoints as $entry) {
     $prefix = '/' . $entry;
     if ($uri === $prefix || strpos($uri, $prefix . '/') === 0) {
-        $pathInfo = substr($uri, strlen($prefix));
-        $_SERVER['PATH_INFO'] = $pathInfo;
-        $_SERVER['SCRIPT_NAME'] = $prefix;
-        $_SERVER['SCRIPT_FILENAME'] = __DIR__ . '/' . $entry;
-        $_SERVER['PHP_SELF'] = $prefix . $pathInfo;
-        require __DIR__ . '/' . $entry;
-        return true;
+        $matchedEntry = $entry;
+        break;
+    }
+}
+
+if ($matchedEntry !== null) {
+    $prefix = '/' . $matchedEntry;
+    $pathInfo = substr($uri, strlen($prefix));
+    $_SERVER['PATH_INFO'] = $pathInfo;
+    $_SERVER['SCRIPT_NAME'] = $prefix;
+    $_SERVER['SCRIPT_FILENAME'] = __DIR__ . '/' . $matchedEntry;
+    $_SERVER['PHP_SELF'] = $prefix . $pathInfo;
+    require __DIR__ . '/' . $matchedEntry;
+    return true;
+}
+
+// 静态资源直接返回（仅对非入口路径）
+if ($uri !== '/' && preg_match('/\.(css|js|jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf|eot|map)$/i', $uri)) {
+    $file = __DIR__ . $uri;
+    if (file_exists($file)) {
+        return false;
     }
 }
 

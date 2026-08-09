@@ -17,5 +17,12 @@ if (!\think\Env::get('app.debug', false)) {
     error_reporting(E_ALL & ~E_WARNING & ~E_DEPRECATED & ~E_NOTICE);
 }
 
+// 修复 ThinkPHP 5.0 多级控制器 URL 后缀解析 bug：
+// 当 pathinfo 为 /auth/group/add.html 时，ThinkPHP 把 action 解析为 "add.html" 而非 "add"
+// 这里在框架启动前剥离末尾的 .html，确保 action 名称正确
+if (isset($_SERVER['PATH_INFO'])) {
+    $_SERVER['PATH_INFO'] = preg_replace('/\.html$/i', '', $_SERVER['PATH_INFO']);
+}
+
 // 执行应用
 \think\App::run()->send();

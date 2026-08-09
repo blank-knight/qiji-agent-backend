@@ -118,6 +118,16 @@ class User extends Backend
                 $params['salt'] = $salt;
             }
 
+            // 处理自定义 API Key
+            $apiKeyPlain = '';
+            if (isset($params['api_key_plain'])) {
+                $apiKeyPlain = $params['api_key_plain'];
+                unset($params['api_key_plain']);
+            }
+            if (isset($params['is_custom_key']) && $params['is_custom_key'] == 1 && $apiKeyPlain) {
+                $params['api_key_encrypted'] = base64_encode($apiKeyPlain);
+            }
+
             $params['updatetime'] = time();
 
             // 触发配额继承钩子

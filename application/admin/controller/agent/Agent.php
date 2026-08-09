@@ -176,6 +176,10 @@ class Agent extends Backend
             }
         }
 
+        // 补充 username 和 type_text（存在 admin 表，agent 表无此字段）
+        $row['username'] = Db::name('admin')->where('id', $row['admin_id'])->value('username');
+        $row['type_text'] = $row['type'] === 'tiepai' ? '贴牌商' : '代理';
+
         $this->view->assign('row', $row);
         $this->assignParentOptions();
         return $this->view->fetch();

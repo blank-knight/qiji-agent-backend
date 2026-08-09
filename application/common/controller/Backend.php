@@ -242,8 +242,10 @@ class Backend extends Controller
 
         // 检测是否需要鉴权
         if ($this->auth->isLogin() && !$this->match($this->noNeedRight)) {
-            // 判断控制器和方法判断是否有对应权限
-            if (!$this->auth->check($this->request->pathinfo())) {
+            // 使用控制器/方法名进行权限比对，避免 pathinfo 中的 ID 段和 .html 后缀干扰
+            // 多级控制器如 user.User → user/user
+            $path = str_replace('.', '/', $controllername) . '/' . $actionname;
+            if (!$this->auth->check($path)) {
                 $this->error(__('You have no permission'));
             }
         }

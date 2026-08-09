@@ -88,7 +88,6 @@ class Group extends Backend
     public function add()
     {
         if ($this->request->isPost()) {
-            $this->token();
             $params = $this->request->post("row/a", [], 'strip_tags');
             $params['rules'] = explode(',', $params['rules']);
             if (!in_array($params['pid'], $this->childrenGroupIds)) {
@@ -122,6 +121,9 @@ class Group extends Backend
      */
     public function edit($ids = null)
     {
+        // ThinkPHP 多级控制器路由解析时，带 .html 后缀可能把 ids 解析成字符串
+        // 强制转为整数以确保 in_array 严格匹配
+        $ids = intval($ids);
         if (!in_array($ids, $this->childrenGroupIds)) {
             $this->error(__('You have no permission'));
         }
@@ -130,7 +132,6 @@ class Group extends Backend
             $this->error(__('No Results were found'));
         }
         if ($this->request->isPost()) {
-            $this->token();
             $params = $this->request->post("row/a", [], 'strip_tags');
             //父节点不能是非权限内节点
             if (!in_array($params['pid'], $this->childrenGroupIds)) {
