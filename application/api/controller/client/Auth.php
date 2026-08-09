@@ -213,7 +213,7 @@ class Auth extends Api
     }
 
     /**
-     * 解析 API Key（层级继承：用户自定义 → 代理 → 贴牌 → 系统）
+     * 解析 API Key（层级继承：用户自定义 → 沿path逐级向上 → 系统）
      */
     private function resolveApiKey($user)
     {
@@ -225,16 +225,22 @@ class Auth extends Api
             $keySource = 'user';
         } elseif ($user->agent_id) {
             $agent = Db::name('agent')->where('id', $user->agent_id)->find();
-            if ($agent) {
-                if (!empty($agent['api_key'])) {
-                    $apiKey    = base64_decode($agent['api_key']);
-                    $keySource = 'agent';
-                }
-                if (!$apiKey && !empty($agent['agent_id'])) {
-                    $parent = Db::name('agent')->where('id', $agent['agent_id'])->find();
-                    if ($parent && !empty($parent['api_key'])) {
-                        $apiKey    = base64_decode($parent['api_key']);
-                        $keySource = 'tiepai';
+            if ($agent && !empty($agent['api_key'])) {
+                $apiKey    = base64_decode($agent['api_key']);
+                $keySource = $agent['type'] === 'tiepai' ? 'tiepai' : 'agent';
+            } else {
+                // 沿 path 逐级向上查找
+                $pathParts = array_filter(explode('/', trim($agent['path'] ?? '', '/')));
+                $pathParts = array_reverse($pathParts);
+                foreach ($pathParts as $ancestorId) {
+                    if ($ancestorId == $user->agent_id) {
+                        continue;
+                    }
+                    $ancestor = Db::name('agent')->where('id', $ancestorId)->find();
+                    if ($ancestor && !empty($ancestor['api_key'])) {
+                        $apiKey    = base64_decode($ancestor['api_key']);
+                        $keySource = $ancestor['type'] === 'tiepai' ? 'tiepai' : 'agent';
+                        break;
                     }
                 }
             }

@@ -58,22 +58,12 @@ class Apikey extends Api
             $keySource     = 'user';
             $keySourceName = '自定义';
         } elseif ($user->agent_id) {
-            $agent = Db::name('agent')->where('id', $user->agent_id)->find();
-            if ($agent) {
-                if (!empty($agent['api_key'])) {
-                    $apiKey        = $this->decryptKey($agent['api_key']);
-                    $keySource     = 'agent';
-                    $keySourceName = $agent['name'] ?: $agent['username'] ?: '代理';
-                }
-
-                if (!$apiKey && !empty($agent['agent_id'])) {
-                    $parent = Db::name('agent')->where('id', $agent['agent_id'])->find();
-                    if ($parent && !empty($parent['api_key'])) {
-                        $apiKey        = $this->decryptKey($parent['api_key']);
-                        $keySource     = 'tiepai';
-                        $keySourceName = $parent['name'] ?: $parent['username'] ?: '贴牌商';
-                    }
-                }
+            // 沿 agent path 逐级向上查找第一个有 api_key 的节点
+            $result = $this->resolveKeyFromPath($user->agent_id);
+            if ($result) {
+                $apiKey        = $result['api_key'];
+                $keySource     = $result['source'];
+                $keySourceName = $result['name'];
             }
         }
 
@@ -137,5 +127,42 @@ class Apikey extends Api
             return '';
         }
         return base64_decode($encrypted);
+    }
+
+    /**
+     * 沿 agent path 逐级向上查找第一个有 api_key 的节点
+     * @return array|null ['api_key'=>..., 'source'=>..., 'name'=>...]
+     */
+    private function resolveKeyFromPath($agentId)
+    {
+        $agent = Db::name('agent')->where('id', $agentId)->find();
+        if (!$agent) {
+            return null;
+        }
+
+        // 从 path 中提取祖先ID（从近到远）
+        // path 格式: /1/5/12/
+        $pathParts = array_filter(explode('/', trim($agent['path'], '/')));
+        if (!$pathParts) {
+            return null;
+        }
+
+        // 倒序：先查最近的上级，再查更远的
+        $pathParts = array_reverse($pathParts);
+        foreach ($pathParts as $ancestorId) {
+            if ($ancestorId == $agentId) {
+                continue; // 跳过自己
+            }
+            $ancestor = Db::name('agent')->where('id', $ancestorId)->find();
+            if ($ancestor && !empty($ancestor['api_key'])) {
+                return [
+                    'api_key' => $this->decryptKey($ancestor['api_key']),
+                    'source'  => $ancestor['type'] === 'tiepai' ? 'tiepai' : 'agent',
+                    'name'    => $ancestor['name'] ?: $ancestor['username'] ?: '上级',
+                ];
+            }
+        }
+
+        return null;
     }
 }

@@ -177,6 +177,8 @@ CREATE TABLE IF NOT EXISTS `fa_agent` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `agent_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '上级贴牌商ID（0=顶级）',
   `admin_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '关联后台管理员ID',
+  `type` varchar(20) DEFAULT 'agent' COMMENT '类型: tiepai=贴牌商, agent=代理',
+  `path` varchar(500) DEFAULT '/' COMMENT '层级路径: /1/5/12/',
   `username` varchar(50) DEFAULT NULL COMMENT '代理用户名',
   `name` varchar(100) DEFAULT NULL COMMENT '代理名称',
   `password` varchar(32) DEFAULT NULL COMMENT '密码',

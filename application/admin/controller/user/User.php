@@ -33,12 +33,21 @@ class User extends Backend
             // 去除排序字段的表名前缀（如 user.id => id）
             $sort = preg_replace('/^\w+\./', '', $sort);
 
+            // 层级数据隔离：贴牌看旗下代理用户，代理只看自己用户
+            $scope = $this->getUserScope();
+            $scopeWhere = [];
+            if ($scope !== null) {
+                $scopeWhere = ['agent_id' => ['in', $scope]];
+            }
+
             $total = $this->model
                 ->where($where)
+                ->where($scopeWhere)
                 ->count();
 
             $list = $this->model
                 ->where($where)
+                ->where($scopeWhere)
                 ->order($sort, $order)
                 ->limit($offset, $limit)
                 ->select();

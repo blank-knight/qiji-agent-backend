@@ -131,6 +131,76 @@ class Backend extends Controller
      */
     use \app\admin\library\traits\Backend;
 
+    /**
+     * 获取当前登录管理员关联的Agent记录
+     * @return array|null ['id'=>..., 'type'=>..., 'path'=>...]
+     */
+    protected function getCurrentAgent()
+    {
+        $adminId = $this->auth->id;
+        if (!$adminId) {
+            return null;
+        }
+        $agent = \think\Db::name('agent')->where('admin_id', $adminId)->find();
+        return $agent ?: null;
+    }
+
+    /**
+     * 是否是超级管理员
+     * 判断标准：没有关联 agent 记录的后台管理员即为超管
+     */
+    protected function isSuperAdmin()
+    {
+        $adminId = $this->auth->id;
+        if (!$adminId) {
+            return false;
+        }
+        // admin_id=1 是初始超级管理员
+        if ($adminId == 1) {
+            return true;
+        }
+        // 检查是否关联了 agent 记录
+        $agent = \think\Db::name('agent')->where('admin_id', $adminId)->find();
+        return $agent ? false : true;
+    }
+
+    /**
+     * 获取当前用户可见的代理ID范围
+     * 超管: null（表示全部）
+     * 贴牌/代理: 只看自己子树
+     * @return array|null ID数组或null（全部）
+     */
+    protected function getAgentScope()
+    {
+        if ($this->isSuperAdmin()) {
+            return null; // 全部
+        }
+        $agent = $this->getCurrentAgent();
+        if (!$agent) {
+            return [0]; // 无关联agent，看不到任何数据
+        }
+        return \app\admin\model\Agent::getDescendantIds($agent['id']);
+    }
+
+    /**
+     * 获取当前用户可见的用户(agent_id)范围
+     * 超管: null（全部）
+     * 贴牌: 所有子孙代理的用户
+     * 代理: 只有自己agent_id的用户
+     * @return array|null agent_id数组或null（全部）
+     */
+    protected function getUserScope()
+    {
+        if ($this->isSuperAdmin()) {
+            return null;
+        }
+        $agent = $this->getCurrentAgent();
+        if (!$agent) {
+            return [0];
+        }
+        return \app\admin\model\Agent::getDescendantIds($agent['id']);
+    }
+
     public function _initialize()
     {
         //移除HTML标签

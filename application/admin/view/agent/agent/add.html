@@ -1,10 +1,46 @@
 <form id="add-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
     {:token()}
 
+    {if condition="$isSuperAdmin"}
     <div class="form-group">
-        <label for="c-name" class="control-label col-xs-12 col-sm-2"><i class="red_color" style="color:red">*</i>代理名称:</label>
+        <label class="control-label col-xs-12 col-sm-2"><i style="color:red">*</i>类型:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_radios('row[type]', ['tiepai'=>'贴牌商', 'agent'=>'代理'], 'tiepai')}
+            <p style="margin-top:5px;font-size:12px;color:#888;">贴牌商可以开下级代理，代理只能管理用户</p>
+        </div>
+    </div>
+    {/if}
+
+    <div class="form-group" id="parent-group" style="display:none;">
+        <label for="c-agent_id" class="control-label col-xs-12 col-sm-2">上级贴牌商:</label>
         <div class="col-xs-12 col-sm-4">
-            <input id="c-name" data-rule="required" class="form-control" name="row[name]" type="text" value="" placeholder="代理名称">
+            <select id="c-agent_id" class="form-control selectpicker" name="row[agent_id]">
+                {volist name="parentOptions" id="name" key="id"}
+                <option value="{$id}" {in name="id" value="0"}selected{/in}>{$name}</option>
+                {/volist}
+            </select>
+            <p style="margin-top:5px;font-size:12px;color:#888;">选择该代理所属的贴牌商</p>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="c-username" class="control-label col-xs-12 col-sm-2"><i style="color:red">*</i>登录账号:</label>
+        <div class="col-xs-12 col-sm-4">
+            <input id="c-username" data-rule="required" class="form-control" name="row[username]" type="text" value="" placeholder="登录后台用">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="c-name" class="control-label col-xs-12 col-sm-2"><i style="color:red">*</i>名称:</label>
+        <div class="col-xs-12 col-sm-4">
+            <input id="c-name" data-rule="required" class="form-control" name="row[name]" type="text" value="" placeholder="显示名称">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="c-password" class="control-label col-xs-12 col-sm-2"><i style="color:red">*</i>密码:</label>
+        <div class="col-xs-12 col-sm-4">
+            <input id="c-password" data-rule="required" class="form-control" name="row[password]" type="password" value="" placeholder="后台登录密码">
         </div>
     </div>
 
@@ -19,22 +55,14 @@
         <label for="c-domain" class="control-label col-xs-12 col-sm-2">代理网址:</label>
         <div class="col-xs-12 col-sm-4">
             <input id="c-domain" class="form-control" name="row[domain]" type="text" value="" placeholder="如 https://agent.example.com">
-            <p style="margin-top: 5px;font-size: 12px;color:#888;">该代理专属的客户端下载/推广网址</p>
+            <p style="margin-top:5px;font-size:12px;color:#888;">该代理专属的客户端下载/推广网址</p>
         </div>
     </div>
 
     <div class="form-group">
-        <label for="c-agent_id" class="control-label col-xs-12 col-sm-2">上级代理ID:</label>
+        <label for="c-score" class="control-label col-xs-12 col-sm-2">积分/点数:</label>
         <div class="col-xs-12 col-sm-4">
-            <input id="c-agent_id" class="form-control" name="row[agent_id]" type="number" value="0" placeholder="0表示总后台">
-            <p style="margin-top: 5px;font-size: 12px;color:#888;">0是总后台的，填写其他则是其他代理的下级</p>
-        </div>
-    </div>
-
-    <div class="form-group">
-        <label for="c-score" class="control-label col-xs-12 col-sm-2"><i class="red_color" style="color:red">*</i>积分/点数:</label>
-        <div class="col-xs-12 col-sm-4">
-            <input id="c-score" data-rule="required" class="form-control" name="row[score]" type="number" value="0" placeholder="积分/点数">
+            <input id="c-score" class="form-control" name="row[score]" type="number" value="0" placeholder="积分/点数">
         </div>
     </div>
 
@@ -49,6 +77,7 @@
         <label class="control-label col-xs-12 col-sm-2">API Key模式:</label>
         <div class="col-xs-12 col-sm-8">
             {:build_radios('row[is_custom_key]', ['0'=>'使用上级API Key','1'=>'自定义API Key'], 0)}
+            <p style="margin-top:5px;font-size:12px;color:#888;">默认不开启自定义Key</p>
         </div>
     </div>
 
@@ -67,3 +96,20 @@
         </div>
     </div>
 </form>
+
+<script>
+$(function(){
+    // 类型切换时显示/隐藏上级选择
+    function toggleParent() {
+        var type = $('input[name="row[type]"]:checked').val();
+        if (type === 'agent') {
+            $('#parent-group').show();
+        } else {
+            $('#parent-group').hide();
+            $('#c-agent_id').val(0);
+        }
+    }
+    $('input[name="row[type]"]').on('change', toggleParent);
+    toggleParent();
+});
+</script>

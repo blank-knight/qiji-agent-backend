@@ -3,9 +3,31 @@
     <input type="hidden" name="row[id]" value="{$row.id}">
 
     <div class="form-group">
-        <label for="c-name" class="control-label col-xs-12 col-sm-2"><i class="red_color" style="color:red">*</i>代理名称:</label>
+        <label class="control-label col-xs-12 col-sm-2">类型:</label>
+        <div class="col-xs-12 col-sm-4">
+            <input class="form-control" type="text" value="{$row.type_text}" readonly disabled>
+            <p style="margin-top:5px;font-size:12px;color:#888;">类型创建后不可更改</p>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">登录账号:</label>
+        <div class="col-xs-12 col-sm-4">
+            <input class="form-control" type="text" value="{$row.username}" readonly disabled>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="c-name" class="control-label col-xs-12 col-sm-2"><i style="color:red">*</i>名称:</label>
         <div class="col-xs-12 col-sm-4">
             <input id="c-name" data-rule="required" class="form-control" name="row[name]" type="text" value="{$row.name}">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="c-password" class="control-label col-xs-12 col-sm-2">重置密码:</label>
+        <div class="col-xs-12 col-sm-4">
+            <input id="c-password" class="form-control" name="row[password]" type="password" value="" placeholder="留空不修改">
         </div>
     </div>
 
@@ -20,22 +42,14 @@
         <label for="c-domain" class="control-label col-xs-12 col-sm-2">代理网址:</label>
         <div class="col-xs-12 col-sm-4">
             <input id="c-domain" class="form-control" name="row[domain]" type="text" value="{$row.domain}" placeholder="如 https://agent.example.com">
-            <p style="margin-top: 5px;font-size: 12px;color:#888;">该代理专属的客户端下载/推广网址</p>
+            <p style="margin-top:5px;font-size:12px;color:#888;">该代理专属的客户端下载/推广网址</p>
         </div>
     </div>
 
     <div class="form-group">
-        <label for="c-agent_id" class="control-label col-xs-12 col-sm-2">上级代理ID:</label>
+        <label for="c-score" class="control-label col-xs-12 col-sm-2">积分/点数:</label>
         <div class="col-xs-12 col-sm-4">
-            <input id="c-agent_id" class="form-control" name="row[agent_id]" type="number" value="{$row.agent_id}" placeholder="0表示总后台">
-            <p style="margin-top: 5px;font-size: 12px;color:#888;">0是总后台的，填写其他则是其他代理的下级</p>
-        </div>
-    </div>
-
-    <div class="form-group">
-        <label for="c-score" class="control-label col-xs-12 col-sm-2"><i class="red_color" style="color:red">*</i>积分/点数:</label>
-        <div class="col-xs-12 col-sm-4">
-            <input id="c-score" data-rule="required" class="form-control" name="row[score]" type="number" value="{$row.score}" placeholder="积分/点数">
+            <input id="c-score" class="form-control" name="row[score]" type="number" value="{$row.score}" placeholder="积分/点数">
         </div>
     </div>
 
