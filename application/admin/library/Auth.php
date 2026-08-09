@@ -225,7 +225,7 @@ class Auth extends \fast\Auth
             return true;
         }
         $admin = Session::get('admin');
-        if (!@$admin['id']) {
+        if (!is_array($admin) || empty($admin['id'])) {
             return false;
         }
         $my = Admin::get($admin['id']);

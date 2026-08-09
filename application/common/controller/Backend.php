@@ -58,6 +58,12 @@ class Backend extends Controller
     protected $assignConfig = [];
 
     /**
+     * 站点配置缓存（assignconfig 实时合并用）
+     * @var array
+     */
+    protected $siteData = [];
+
+    /**
      * 关联查询
      * @var bool
      */
@@ -233,21 +239,15 @@ class Backend extends Controller
             'storage'   => 'local',
         ];
         $site['upload'] = $uploadConfig;
+        $this->siteData = $site;
         $config = [
             'site' => $site,
         ];
         $this->view->assign('config', $config);
+        $this->view->assign('site', $site);
 
         // 设置布局模板（仅非AJAX请求，且控制器未禁用layout时）
         if (!IS_AJAX && $this->layout) {
-            // 合并 assignConfig 到 config 变量
-            if ($this->assignConfig) {
-                // 将 assignConfig 合并到 site 下，以便前端 window.Config 能访问
-                $site = array_merge($site, $this->assignConfig);
-                $config = ['site' => $site];
-                $this->view->assign('config', $config);
-                $this->view->assign('site', $site);
-            }
             $this->view->engine->layout('layout/' . $this->layout);
         }
     }
@@ -260,6 +260,12 @@ class Backend extends Controller
     public function assignconfig($name, $value = '')
     {
         $this->assignConfig[$name] = $value;
+        // 实时合并到 view 的 config 变量，确保子控制器 _initialize 中的调用生效
+        if ($this->siteData) {
+            $site = array_merge($this->siteData, $this->assignConfig);
+            $this->view->assign('config', ['site' => $site]);
+            $this->view->assign('site', $site);
+        }
     }
 
     /**
