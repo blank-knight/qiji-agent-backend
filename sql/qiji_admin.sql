@@ -182,6 +182,7 @@ CREATE TABLE IF NOT EXISTS `fa_agent` (
   `password` varchar(32) DEFAULT NULL COMMENT '密码',
   `salt` varchar(30) DEFAULT NULL COMMENT '密码盐',
   `mobile` varchar(20) DEFAULT NULL COMMENT '联系电话',
+  `domain` varchar(255) DEFAULT NULL COMMENT '代理网址',
   `email` varchar(100) DEFAULT NULL COMMENT '邮箱',
   `score` int(10) NOT NULL DEFAULT '0' COMMENT '剩余配额',
   `total_score` int(10) NOT NULL DEFAULT '0' COMMENT '累计配额',

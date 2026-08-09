@@ -73,52 +73,52 @@
                             <!-- 概览统计 -->
                             <div class="row">
                                 <div class="col-md-2 col-sm-4 col-xs-6">
-                                    <div class="stat-box stat-purple">
+                                    <a href="user/user" class="addtabsit"><div class="stat-box stat-purple">
                                         <i class="fa fa-users stat-icon"></i>
                                         <div class="stat-num">{$totaluser}</div>
                                         <div class="stat-label">总用户数</div>
                                         <div class="stat-today">今日注册 +{$todayusersignup} | 周新 {$sevendnu}</div>
-                                    </div>
+                                    </div></a>
                                 </div>
                                 <div class="col-md-2 col-sm-4 col-xs-6">
-                                    <div class="stat-box stat-blue">
+                                    <a href="agent/agent" class="addtabsit"><div class="stat-box stat-blue">
                                         <i class="fa fa-building stat-icon"></i>
                                         <div class="stat-num">{$article_count}</div>
                                         <div class="stat-label">代理/企业数</div>
                                         <div class="stat-today">正常 {$agent_normal} | 禁用 {$agent_hidden}</div>
-                                    </div>
+                                    </div></a>
                                 </div>
                                 <div class="col-md-2 col-sm-4 col-xs-6">
-                                    <div class="stat-box stat-green">
+                                    <a href="agent/agent" class="addtabsit"><div class="stat-box stat-green">
                                         <i class="fa fa-key stat-icon"></i>
                                         <div class="stat-num">{$totalkeys}</div>
                                         <div class="stat-label">API Key 数</div>
                                         <div class="stat-today">已分配密钥</div>
-                                    </div>
+                                    </div></a>
                                 </div>
                                 <div class="col-md-2 col-sm-4 col-xs-6">
-                                    <div class="stat-box stat-orange">
+                                    <a href="statistics/scorelog" class="addtabsit"><div class="stat-box stat-orange">
                                         <i class="fa fa-line-chart stat-icon"></i>
                                         <div class="stat-num">{$totaltoken}</div>
                                         <div class="stat-label">Token 总消耗</div>
                                         <div class="stat-today">今日 {$unsettleorder}</div>
-                                    </div>
+                                    </div></a>
                                 </div>
                                 <div class="col-md-2 col-sm-4 col-xs-6">
-                                    <div class="stat-box stat-teal">
+                                    <a href="statistics/scorelog" class="addtabsit"><div class="stat-box stat-teal">
                                         <i class="fa fa-exchange stat-icon"></i>
                                         <div class="stat-num">{$totalorder}</div>
                                         <div class="stat-label">API 请求总数</div>
                                         <div class="stat-today">今日 {$todayorder} 次</div>
-                                    </div>
+                                    </div></a>
                                 </div>
                                 <div class="col-md-2 col-sm-4 col-xs-6">
-                                    <div class="stat-box stat-red">
+                                    <a href="user/user" class="addtabsit"><div class="stat-box stat-red">
                                         <i class="fa fa-sign-in stat-icon"></i>
                                         <div class="stat-num">{$todayuserlogin}</div>
                                         <div class="stat-label">今日活跃</div>
                                         <div class="stat-today">周活跃 {$sevendau}</div>
-                                    </div>
+                                    </div></a>
                                 </div>
                             </div>
 
@@ -157,8 +157,8 @@
                                             <tr><td style="color:#999;">当前管理员</td><td style="font-weight:500;">{$admin.nickname|default=$admin.username|default='admin'}</td></tr>
                                         </table>
                                         <div style="margin-top:15px;">
-                                            <a href="agent" class="addtabsit btn btn-default btn-sm"><i class="fa fa-users text-primary"></i> 代理管理</a>
-                                            <a href="user" class="addtabsit btn btn-default btn-sm"><i class="fa fa-user text-info"></i> 用户管理</a>
+                                            <a href="agent/agent" class="addtabsit btn btn-default btn-sm"><i class="fa fa-users text-primary"></i> 代理管理</a>
+                                            <a href="user/user" class="addtabsit btn btn-default btn-sm"><i class="fa fa-user text-info"></i> 用户管理</a>
                                             <a href="statistics/scorelog" class="addtabsit btn btn-default btn-sm"><i class="fa fa-bar-chart text-success"></i> 消费记录</a>
                                             <a href="general/config" class="addtabsit btn btn-default btn-sm"><i class="fa fa-cogs text-danger"></i> 配置</a>
                                         </div>

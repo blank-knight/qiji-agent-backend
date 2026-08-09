@@ -27,6 +27,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         {field: 'id', title: __('Id'), sortable: true},
                         {field: 'name', title: '代理名称', operate: 'LIKE'},
                         {field: 'mobile', title: '手机号', operate: 'LIKE'},
+                        {field: 'domain', title: '代理网址', operate: 'LIKE', formatter: function(value){ return value ? '<a href="' + value + '" target="_blank" title="' + value + '">' + value + '</a>' : '-'; }},
                         {field: 'agent_id', title: '上级代理ID', sortable: true},
                         {field: 'score', title: '积分/点数', operate: 'BETWEEN', sortable: true},
                         {field: 'is_custom_key', title: 'API配置', searchList: {1: '自定义API', 0: '使用上级API'}, formatter: Table.api.formatter.label},
