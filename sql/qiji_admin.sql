@@ -258,6 +258,14 @@ CREATE TABLE IF NOT EXISTS `fa_version` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='版本管理';
 
+CREATE TABLE IF NOT EXISTS `fa_session` (
+  `id` CHAR(32) NOT NULL COMMENT 'Session ID',
+  `expire` INT(11) NOT NULL DEFAULT '0' COMMENT '过期时间戳',
+  `data` BLOB COMMENT '序列化数据',
+  PRIMARY KEY (`id`),
+  KEY `idx_expire` (`expire`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='后台Session表（多机共享登录态）';
+
 -- -------------------------------------------------------------------
 -- 六、初始数据
 -- -------------------------------------------------------------------

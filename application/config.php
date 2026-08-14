@@ -204,8 +204,13 @@ return [
         'var_session_id' => '',
         // SESSION 前缀
         'prefix'         => 'think',
-        // 驱动方式 支持redis memcache memcached
-        'type'           => '',
+        // 驱动方式 空本地文件 / redis memcache memcached mysql
+        // 多机部署时必须改为 mysql 或 redis，否则登录态不共享
+        'type'           => 'mysql',
+        // session表名（含前缀）
+        'table'          => 'fa_session',
+        // session有效期（秒）
+        'expire'         => 86400,
         // 是否自动开启 SESSION
         'auto_start'     => true,
         // redis主机
