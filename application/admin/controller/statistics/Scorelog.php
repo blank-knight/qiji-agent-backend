@@ -37,9 +37,19 @@ class Scorelog extends Backend
                 ->limit($offset, $limit)
                 ->select();
 
-            foreach ($list as &$row) {
-                $row['username'] = db('user')->where('id', $row['user_id'])->value('username');
+            // 批量取用户名：不要在循环里用 db()（每次都会新建 PDO 连接，
+            // SQLite 下多连接读写锁冲突会导致请求结束时 session 写入死锁）
+            $userIds = [];
+            foreach ($list as $row) {
+                $userIds[] = $row['user_id'];
             }
+            $usernames = $userIds
+                ? \think\Db::name('user')->where('id', 'in', $userIds)->column('username', 'id')
+                : [];
+            foreach ($list as &$row) {
+                $row['username'] = isset($usernames[$row['user_id']]) ? $usernames[$row['user_id']] : '';
+            }
+            unset($row);
 
             $result = ['total' => $total, 'rows' => $list];
             return json($result);

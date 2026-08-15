@@ -645,17 +645,36 @@ class Backend extends Controller
     }
 
     /**
-     * 批量更新
+     * 批量更新（列表页开关/状态切换）
+     * 前端 Table.api.multi 提交格式：action + ids + params（如 params=ismenu=1）
      */
     public function multi($ids = '')
     {
         $ids = $ids ? $ids : $this->request->param('ids');
         if ($ids) {
-            $params = $this->request->param();
-            $count = $this->model->where('id', 'in', $ids)->update($params);
-            if ($count) {
-                $this->success();
+            $values = [];
+            if ($this->request->has('params')) {
+                // params 是 a=b&c=d 形式的查询串，直接读 $_POST 避免 TP5 默认
+                // 的 htmlspecialchars 过滤器把 & 转义成 &amp; 导致解析错误
+                parse_str(isset($_POST['params']) ? $_POST['params'] : '', $values);
+                // 只允许更新白名单字段，防止越权改任意列
+                $multiFields = is_array($this->multiFields) ? $this->multiFields : explode(',', $this->multiFields);
+                $values = array_intersect_key($values, array_flip($multiFields));
             }
+            if (!$values) {
+                $this->error(__('Parameter %s can not be empty', 'params'));
+            }
+            // 数据权限范围自动填充
+            if ($this->dataLimit && $this->dataLimitFieldAutoFill) {
+                $values[$this->dataLimitField] = $this->auth->id;
+            }
+            $result = $this->model->allowField(true)->save($values, function ($query) use ($ids) {
+                $query->where('id', 'in', $ids);
+            });
+            if ($result === false) {
+                $this->error($this->model->getError());
+            }
+            $this->success();
         }
         $this->error(__('Parameter %s can not be empty', 'ids'));
     }

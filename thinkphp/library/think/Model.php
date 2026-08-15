@@ -1379,13 +1379,18 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
     public static function __callStatic($method, $params)
     {
         $model = get_called_class();
-        // TP5.0.0 事件方法拦截：beforeWrite/beforeInsert 等不应转发给 Query
-        if (strpos($method, 'before') === 0 || strpos($method, 'after') === 0) {
-            $event = strtolower(substr($method, 6)); // beforeWrite → write
-            if (empty(self::$event[$event])) {
-                self::$event[$event] = [];
-            }
-            self::$event[$event][] = [new static(), $params[0]];
+        // TP5.0.0 事件方法拦截：beforeWrite/afterWrite 等不应转发给 Query。
+        // 事件名映射为 before_write/after_write...，并按 self::event() 的结构
+        // 存入 self::$event[$class][$event]，与 trigger() 的查找方式保持一致
+        if (strpos($method, 'before') === 0) {
+            $event = 'before_' . strtolower(substr($method, 6));
+        } elseif (strpos($method, 'after') === 0) {
+            $event = 'after_' . strtolower(substr($method, 5));
+        } else {
+            $event = '';
+        }
+        if ($event) {
+            self::$event[$model][$event][] = $params[0];
             return null;
         }
         if (!isset(self::$links[$model])) {

@@ -66,7 +66,6 @@ class Rule extends Backend
     public function add()
     {
         if ($this->request->isPost()) {
-            $this->token();
         }
         return parent::add();
     }
@@ -77,7 +76,6 @@ class Rule extends Backend
     public function edit($ids = null)
     {
         if ($this->request->isPost()) {
-            $this->token();
         }
         return parent::edit($ids);
     }

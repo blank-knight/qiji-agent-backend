@@ -2,6 +2,7 @@ define(['jquery', 'bootstrap', 'backend', 'table'], function ($, undefined, Back
 
     var Controller = {
         index: function () {
+            // 初始化表格参数配置
             Table.api.init({
                 extend: {
                     index_url: 'statistics/scorelog/index',
@@ -11,6 +12,7 @@ define(['jquery', 'bootstrap', 'backend', 'table'], function ($, undefined, Back
 
             var table = $("#table");
 
+            // 初始化表格
             table.bootstrapTable({
                 url: $.fn.bootstrapTable.defaults.extend.index_url,
                 pk: 'id',
@@ -29,6 +31,7 @@ define(['jquery', 'bootstrap', 'backend', 'table'], function ($, undefined, Back
                 ]
             });
 
+            // 为表格绑定事件
             Table.api.bindevent(table);
         }
     };

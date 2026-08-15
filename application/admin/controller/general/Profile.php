@@ -19,6 +19,13 @@ class Profile extends Backend
     protected $searchFields = 'id,title';
 
     /**
+     * 个人资料仅操作本人数据（均以 $this->auth->id 为准），
+     * 对所有已登录管理员开放，不参与权限规则校验
+     * （否则贴牌商/代理等无 general/profile 规则的账号会收到 500 You have no permission）
+     */
+    protected $noNeedRight = ['*'];
+
+    /**
      * 查看
      */
     public function index()
@@ -48,14 +55,14 @@ class Profile extends Backend
     public function update()
     {
         if ($this->request->isPost()) {
-            $this->token();
             $params = $this->request->post("row/a");
             $params = array_filter(array_intersect_key(
                 $params,
                 array_flip(array('email', 'nickname', 'password', 'avatar'))
             ));
             unset($v);
-            if (!Validate::is($params['email'], "email")) {
+            // email 可选：本系统贴牌商/代理等账号默认无邮箱，仅在填写时校验格式
+            if (isset($params['email']) && !Validate::is($params['email'], "email")) {
                 $this->error(__("Please input correct email"));
             }
             if (isset($params['password'])) {
@@ -65,9 +72,11 @@ class Profile extends Backend
                 $params['salt'] = Random::alnum();
                 $params['password'] = md5(md5($params['password']) . $params['salt']);
             }
-            $exist = Admin::where('email', $params['email'])->where('id', '<>', $this->auth->id)->find();
-            if ($exist) {
-                $this->error(__("Email already exists"));
+            if (isset($params['email'])) {
+                $exist = Admin::where('email', $params['email'])->where('id', '<>', $this->auth->id)->find();
+                if ($exist) {
+                    $this->error(__("Email already exists"));
+                }
             }
             if ($params) {
                 $admin = Admin::get($this->auth->id);

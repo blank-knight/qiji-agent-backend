@@ -33,6 +33,27 @@ class Sqlite extends Connection
     }
 
     /**
+     * 连接数据库（重写：附加 SQLite 专用 PRAGMA）
+     * WAL 模式下读不阻塞写、写不阻塞读，避免同进程多连接时
+     * （如 db() 助手新建连接 + Session 写库）出现锁死等待
+     */
+    public function connect(array $config = [], $linkNum = 0, $autoConnection = false)
+    {
+        $isNew = !isset($this->links[$linkNum]);
+        $pdo   = parent::connect($config, $linkNum, $autoConnection);
+        if ($isNew && $pdo) {
+            try {
+                $pdo->exec('PRAGMA journal_mode = WAL');
+                // 写锁冲突时最多等 5 秒（默认 60 秒会让单线程服务器长时间卡死）
+                $pdo->exec('PRAGMA busy_timeout = 5000');
+            } catch (\PDOException $e) {
+                // 只读库或旧环境不支持时忽略，不影响常规查询
+            }
+        }
+        return $pdo;
+    }
+
+    /**
      * 取得数据表的字段信息
      * @access public
      * @param string $tableName

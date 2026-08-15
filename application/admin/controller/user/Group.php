@@ -27,7 +27,6 @@ class Group extends Backend
     public function add()
     {
         if ($this->request->isPost()) {
-            $this->token();
         }
         $nodeList = \app\admin\model\UserRule::getTreeList();
         $this->assign("nodeList", $nodeList);
@@ -37,7 +36,6 @@ class Group extends Backend
     public function edit($ids = null)
     {
         if ($this->request->isPost()) {
-            $this->token();
         }
         $row = $this->model->get($ids);
         if (!$row) {
