@@ -571,13 +571,14 @@ mysql -u root -p qiji_admin < /www/wwwroot/qiji-admin/sql/qiji_admin.sql
 
 #### 3. 配置环境
 
-复制 `.env.example` 为 `.env`（或直接编辑 `.env`）：
+复制 `.env.example` 为 `.env`（或直接编辑 `.env`）。**`type = mysql` 必须写**（缺省是 sqlite，仅本地开发用）：
 
 ```ini
 [app]
 debug = false
 
 [database]
+type = mysql
 hostname = 127.0.0.1
 database = qiji_admin
 username = your_db_user
@@ -585,6 +586,8 @@ password = your_db_password
 hostport = 3306
 prefix = fa_
 ```
+
+PHP 需启用扩展：`pdo_mysql`、`fileinfo`、`curl`、`mbstring`、`bcmath`、`openssl`、`gd`（宝塔 → PHP 设置 → 安装扩展）。
 
 #### 4. 宝塔面板配置
 
@@ -615,9 +618,11 @@ location / {
 cd /www/wwwroot/qiji-admin
 chown -R www:www .
 chmod -R 755 .
-mkdir -p runtime
-chmod -R 777 runtime
+mkdir -p runtime public/uploads
+chmod -R 777 runtime public/uploads
 ```
+
+> `public/uploads` 不入 git（头像等上传文件），克隆后需手动创建，否则上传头像报错。
 
 #### 6. 访问验证
 

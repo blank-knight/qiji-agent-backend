@@ -242,19 +242,20 @@ CREATE TABLE IF NOT EXISTS `fa_config` (
 -- ----------------------------
 -- 版本表
 -- ----------------------------
+-- 字段与 init_sqlite.php 保持一致（后台版本管理与 /api 更新检测依赖 upgradetext/version 字段）
 CREATE TABLE IF NOT EXISTS `fa_version` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(30) DEFAULT NULL COMMENT '应用名称',
-  `newversion` varchar(30) DEFAULT NULL COMMENT '新版本号',
-  `downloadurl` varchar(255) DEFAULT NULL COMMENT '下载地址',
-  `requireversion` varchar(30) DEFAULT NULL COMMENT '需要的版本',
-  `content` varchar(500) DEFAULT NULL COMMENT '升级版内容',
-  `packagesize` varchar(30) DEFAULT NULL COMMENT '包大小',
-  `enforce` tinyint(1) unsigned DEFAULT '0' COMMENT '是否强制更新',
+  `version` varchar(30) NOT NULL DEFAULT '' COMMENT '当前版本号',
+  `newversion` varchar(30) NOT NULL DEFAULT '' COMMENT '新版本号',
+  `downloadurl` varchar(255) NOT NULL DEFAULT '' COMMENT '下载地址',
+  `requireversion` varchar(30) NOT NULL DEFAULT '' COMMENT '需要的版本（留空不限制）',
+  `packagesize` varchar(30) NOT NULL DEFAULT '' COMMENT '包大小',
+  `enforce` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '是否强制更新',
+  `upgradetext` text COMMENT '更新说明',
   `createtime` int(10) DEFAULT NULL,
   `updatetime` int(10) DEFAULT NULL,
   `weigh` int(10) NOT NULL DEFAULT '0',
-  `status` varchar(30) DEFAULT 'normal' COMMENT '状态',
+  `status` varchar(30) NOT NULL DEFAULT 'normal' COMMENT '状态',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='版本管理';
 
@@ -278,7 +279,8 @@ VALUES (1, 'admin', '超级管理员', '14e1b600b1fd579f47433b88e8d85291', '', '
 INSERT INTO `fa_auth_group` (`id`, `pid`, `name`, `rules`, `createtime`, `updatetime`, `status`)
 VALUES
 (1, 0, '超级管理员', '*', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 'normal'),
-(2, 1, '代理管理员', '10,11,12,13,14,15', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 'normal');
+-- 版本管理(11)仅超管可用：版本记录为全局数据，代理/贴牌商发版会影响全平台客户端
+(2, 1, '代理管理员', '10,12,13,14,15', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 'normal');
 
 -- 管理员分组关联
 INSERT INTO `fa_auth_group_access` (`uid`, `group_id`) VALUES (1, 1);
@@ -324,8 +326,8 @@ VALUES (1, 0, 0, 'testagent', '测试代理', '14e1b600b1fd579f47433b88e8d85291'
 INSERT INTO `fa_agent_invite` (`id`, `agent_id`, `invite_code`, `name`, `max_count`, `used_count`, `expiretime`, `status`, `createtime`, `updatetime`)
 VALUES (1, 1, 'QIJI001', '首批测试邀请码', 0, 0, 0, 'normal', UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
 
--- 初始版本记录
-INSERT INTO `fa_version` (`id`, `name`, `newversion`, `downloadurl`, `requireversion`, `content`, `packagesize`, `enforce`, `createtime`, `updatetime`, `weigh`, `status`)
-VALUES (1, 'qiji-agent', '1.0.0', '', '0.0.1', '首个版本', '0MB', 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0, 'normal');
+-- 初始版本记录（示例，正式发版请在后台「版本管理」操作）
+INSERT INTO `fa_version` (`id`, `version`, `newversion`, `downloadurl`, `requireversion`, `packagesize`, `enforce`, `upgradetext`, `createtime`, `updatetime`, `weigh`, `status`)
+VALUES (1, '1.0.0', '1.0.0', '', '', '', 0, '首个版本', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), 0, 'normal');
 
 SET FOREIGN_KEY_CHECKS = 1;
