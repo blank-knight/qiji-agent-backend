@@ -45,29 +45,39 @@ class Ajax extends Backend
                 \think\Cache::clear();
                 break;
             case 'template':
-                $tempFiles = glob(\think\Config::get('template.compiled_path') . '*');
-                foreach ($tempFiles as $file) {
-                    if (is_file($file)) {
-                        @unlink($file);
-                    }
-                }
+                $this->clearTemplateCache();
                 break;
             case 'addons':
                 break;
             case 'all':
             default:
                 \think\Cache::clear();
-                $tempFiles = glob(\think\Config::get('template.compiled_path') . '*');
-                foreach ($tempFiles as $file) {
-                    if (is_file($file)) {
-                        @unlink($file);
-                    }
-                }
+                $this->clearTemplateCache();
                 break;
         }
 
         \think\Hook::listen("wipecache_after");
         $this->success();
+    }
+
+    /**
+     * 清理模板编译缓存(仅限 runtime/temp/ 目录, 绝不相对路径glob)
+     * 修复: Config里无template.compiled_path键时glob('*')会匹配public/下所有文件并删除
+     */
+    protected function clearTemplateCache()
+    {
+        $dir = TEMP_PATH; // RUNTIME_PATH . 'temp' . DS, 由框架定义
+        if (!is_dir($dir)) {
+            return;
+        }
+        $tempFiles = glob($dir . '*');
+        if ($tempFiles) {
+            foreach ($tempFiles as $file) {
+                if (is_file($file)) {
+                    @unlink($file);
+                }
+            }
+        }
     }
 
     /**
