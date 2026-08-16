@@ -211,18 +211,20 @@ class Backend extends Controller
         $actionname = strtolower($this->request->action());
 
         // 定义是否Addtabs请求
-        // 必须同时满足：URL带addtabs参数 + 实际来自iframe请求
-        // 现代浏览器(Chromium 80+)用 Sec-Fetch-Dest 头精确判断，F5刷新(即使URL带addtabs=1)也会被重定向到主框架；
-        // 旧内核浏览器不发送 Sec-Fetch-* 头，无法区分iframe与直接访问，退回按参数判断(FastAdmin原生行为)，
-        // 否则iframe内容页会被重定向进主框架，主框架再建iframe，造成无限嵌套
-        $addtabsParam = ($this->request->param("ref") == 'addtabs' || $this->request->param("addtabs"));
+        // 判定规则（三层）:
+        // 1. iframe加载: URL带数值参数 addtabs=1（PHP渲染iframe和JS建tab时都是这个形式）
+        // 2. 顶层导航: URL带 ref=addtabs（菜单<a>原始href, 只会在JS未拦截的顶层请求中出现）
+        // 3. 请求头辅助: 现代浏览器(Chromium 80+)发Sec-Fetch-Dest头, document=顶层F5, iframe=iframe内
+        //    部分浏览器/代理/WAF不发送该头 → 头缺失时不作为iframe证据(退回按参数判断)
+        // 历史bug: 曾把 ref==addtabs 也当作iframe标记, 导致旧内核浏览器F5刷新后渲染裸内容页(侧栏顶栏消失)
+        $addtabsParam = (bool)$this->request->param("addtabs");
         $secFetchDest = $this->request->server('HTTP_SEC_FETCH_DEST');
-        $isIframe = is_null($secFetchDest) ? true : $secFetchDest === 'iframe';
-        !defined('IS_ADDTABS') && define('IS_ADDTABS', ($addtabsParam && $isIframe) ? true : false);
+        $isIframe = is_null($secFetchDest) ? null : ($secFetchDest === 'iframe');
+        !defined('IS_ADDTABS') && define('IS_ADDTABS', ($addtabsParam && $isIframe !== false) ? true : false);
 
         // 定义是否Dialog请求（同样需要实际来自iframe）
         $dialogParam = $this->request->param("dialog");
-        !defined('IS_DIALOG') && define('IS_DIALOG', ($dialogParam && $isIframe) ? true : false);
+        !defined('IS_DIALOG') && define('IS_DIALOG', ($dialogParam && $isIframe !== false) ? true : false);
 
         // 定义是否AJAX请求
         !defined('IS_AJAX') && define('IS_AJAX', $this->request->isAjax());
