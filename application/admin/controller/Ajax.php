@@ -102,12 +102,28 @@ class Ajax extends Backend
             $fileName = $info->getSaveName();
             $url = '/uploads/' . str_replace('\\', '/', $fileName);
 
+            // mime检测: fileinfo扩展可能未安装(致命错误), 带fallback
+            $mime = 'application/octet-stream';
+            if (function_exists('finfo_open')) {
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $mime = finfo_file($finfo, $info->getPathname());
+                finfo_close($finfo);
+            } elseif (function_exists('mime_content_type')) {
+                $mime = @mime_content_type($info->getPathname());
+            } else {
+                // 图片场景兜底: getimagesize能返回mime, 非图片返回false
+                $imgInfo = @getimagesize($info->getPathname());
+                if ($imgInfo && !empty($imgInfo['mime'])) {
+                    $mime = $imgInfo['mime'];
+                }
+            }
+
             Db::name('attachment')->insert([
                 'admin_id'   => $this->auth->id,
                 'url'        => $url,
                 'filename'   => $info->getFilename(),
                 'filesize'   => $info->getSize(),
-                'mimetype'   => $info->getMime(),
+                'mimetype'   => $mime,
                 'extension'  => strtolower($info->getExtension()),
                 'uploadtime' => time(),
                 'storage'    => 'local',
