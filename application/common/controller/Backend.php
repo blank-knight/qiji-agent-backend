@@ -211,10 +211,13 @@ class Backend extends Controller
         $actionname = strtolower($this->request->action());
 
         // 定义是否Addtabs请求
-        // 必须同时满足：URL带addtabs参数 + 实际来自iframe请求（Sec-Fetch-Dest）
-        // 这样浏览器F5刷新时（即使URL带addtabs=1）也会被重定向到主框架
+        // 必须同时满足：URL带addtabs参数 + 实际来自iframe请求
+        // 现代浏览器(Chromium 80+)用 Sec-Fetch-Dest 头精确判断，F5刷新(即使URL带addtabs=1)也会被重定向到主框架；
+        // 旧内核浏览器不发送 Sec-Fetch-* 头，无法区分iframe与直接访问，退回按参数判断(FastAdmin原生行为)，
+        // 否则iframe内容页会被重定向进主框架，主框架再建iframe，造成无限嵌套
         $addtabsParam = ($this->request->param("ref") == 'addtabs' || $this->request->param("addtabs"));
-        $isIframe = $this->request->server('HTTP_SEC_FETCH_DEST') === 'iframe';
+        $secFetchDest = $this->request->server('HTTP_SEC_FETCH_DEST');
+        $isIframe = is_null($secFetchDest) ? true : $secFetchDest === 'iframe';
         !defined('IS_ADDTABS') && define('IS_ADDTABS', ($addtabsParam && $isIframe) ? true : false);
 
         // 定义是否Dialog请求（同样需要实际来自iframe）
