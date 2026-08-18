@@ -1458,6 +1458,15 @@ table.table-nowrap thead > tr > th {
 .checkbox > label > input {
   margin: 5px 0 0;
 }
+/*修复单选行右侧内容比左侧标签偏上7px(标签有padding-top:7px对齐34px输入框,单选行右侧无此补偿)*/
+.form-horizontal .radio-fix {
+  padding-top: 8px;
+  margin-right: 15px;
+}
+.form-horizontal .radio-fix input[type="radio"] {
+  margin: 4px 0 0;
+  vertical-align: top;
+}
 .wipecache li a {
   color: #444444 !important;
 }

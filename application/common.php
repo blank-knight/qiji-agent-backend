@@ -405,7 +405,7 @@ if (!function_exists('build_radios')) {
         $selected = is_null($selected) ? key($list) : $selected;
         foreach ($list as $k => $v) {
             $checked = $k == $selected ? ' checked' : '';
-            $html .= '<label><input type="radio" name="' . $name . '" value="' . htmlspecialchars($k) . '"' . $checked . '> ' . htmlspecialchars($v) . '</label> ';
+            $html .= '<label class="radio-fix"><input type="radio" name="' . $name . '" value="' . htmlspecialchars($k) . '"' . $checked . '> ' . htmlspecialchars($v) . '</label> ';
         }
         return $html;
     }
