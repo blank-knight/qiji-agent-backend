@@ -21,7 +21,7 @@
             };
         </script>
     </head>
-    <body class="hold-transition skin-black-blue {:input('dialog') && $Think.server.HTTP_SEC_FETCH_DEST=='iframe'?'is-dialog':''}" style="padding-top:50px;">
+    <body class="hold-transition skin-black-blue {:defined('IS_DIALOG') && IS_DIALOG ? 'is-dialog' : ''}" style="padding-top:50px;">
 
         {__CONTENT__}
 
