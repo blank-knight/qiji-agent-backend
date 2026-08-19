@@ -74,6 +74,7 @@ class Apikey extends Api
         $this->success('', [
             'is_custom_key'  => (int)$user->is_custom_key,
             'api_key'        => $apiKey,
+            'base_url'       => config('site.default_base_url') ?: '',
             'key_source'     => $keySource,
             'key_source_name'=> $keySourceName,
             'can_customize'  => (int)$user->is_custom_key ? true : false,
