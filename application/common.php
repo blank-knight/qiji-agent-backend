@@ -18,6 +18,11 @@ $sessionPath = RUNTIME_PATH . 'session';
 if (!is_dir($sessionPath)) {
     @mkdir($sessionPath, 0777, true);
 }
+
+// 加载 extra 目录站点配置（本框架未自动扫描 extra 目录，site.version 等配置依赖此处）
+if (class_exists('\think\Config') && defined('APP_PATH') && is_file(APP_PATH . 'extra' . DS . 'site' . EXT)) {
+    \think\Config::load(APP_PATH . 'extra' . DS . 'site' . EXT, 'site');
+}
 if (is_dir($sessionPath) && is_writable($sessionPath)) {
     session_save_path($sessionPath);
 }
