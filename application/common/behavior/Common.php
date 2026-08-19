@@ -30,15 +30,13 @@ class Common
         $timezone = Config::get('default_timezone');
         date_default_timezone_set($timezone ?: 'Asia/Shanghai');
 
-        // 从数据库加载配置
+        // 从数据库加载配置（合并进 site 命名空间，与 extra/site.php 一致）
         try {
             $configList = \think\Db::name('config')
-                ->where('status', '<>', 'hidden')
-                ->cache(true)
                 ->column('value', 'name');
 
             foreach ($configList as $name => $value) {
-                Config::set($name, $value);
+                Config::set($name, $value, 'site');
             }
         } catch (\Exception $e) {
             // 数据库未就绪时忽略
