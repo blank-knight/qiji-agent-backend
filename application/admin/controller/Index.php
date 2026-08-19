@@ -14,9 +14,50 @@ use think\Validate;
  */
 class Index extends Backend
 {
-    protected $noNeedLogin = ['login', 'logout'];
+    protected $noNeedLogin = ['login', 'logout', 'impersonate'];
     protected $noNeedRight = ['*'];
     protected $layout = '';
+
+    /**
+     * 越权登录票据领取（配合 agent/agent/loginas）
+     * 新标签打开 admin.php/index/impersonate?ticket=xxx，凭票换取目标身份会话
+     */
+    public function impersonate()
+    {
+        $ticket = $this->request->get('ticket', '');
+        if (!$ticket) {
+            $this->error('缺少票据');
+        }
+        $info = Session::get('impersonate_ticket');
+        Session::delete('impersonate_ticket');
+        if (!$info || $info['ticket'] !== $ticket || $info['expire'] < time()) {
+            $this->error('票据无效或已过期');
+        }
+
+        $admin = \think\Db::name('admin')->where('id', $info['admin_id'])->where('status', 'normal')->find();
+        if (!$admin) {
+            $this->error('目标账号不存在或已禁用');
+        }
+
+        // 记录切换前的身份，供"返回原身份"使用
+        $previous = Session::get('admin');
+        $previousId = $previous && !empty($previous['id']) ? (int)$previous['id'] : 0;
+        if ($previousId && $previousId != $admin['id']) {
+            Session::set('impersonate_back', $previousId);
+        }
+
+        // 建立目标身份会话（对齐 Auth::login 的关键字段）
+        $admin['token'] = \fast\Random::uuid();
+        \think\Db::name('admin')->where('id', $admin['id'])->update([
+            'token' => $admin['token'],
+            'logintime' => time(),
+            'loginip' => $this->request->ip(),
+        ]);
+        Session::set('admin', $admin);
+        Session::set('admin.safecode', md5(md5($admin['username']) . md5(substr($admin['password'], 0, 6)) . config('token.key')));
+
+        $this->redirect(url('index/index'));
+    }
 
     /**
      * 后台首页
@@ -37,7 +78,42 @@ class Index extends Backend
         $this->view->assign('fixedmenu', $fixedmenu);
         $this->view->assign('referermenu', null);
 
+        // 越权切换提示条（上级进入下级后台时显示"返回原身份"）
+        $impersonating = null;
+        $backId = \think\Session::get('impersonate_back');
+        if ($backId && $backId != $this->auth->id) {
+            $backAdmin = \think\Db::name('admin')->where('id', $backId)->field('id,username,nickname')->find();
+            if ($backAdmin) {
+                $impersonating = [
+                    'current' => $this->auth->nickname ?: $this->auth->username,
+                    'back'    => $backAdmin['nickname'] ?: $backAdmin['username'],
+                ];
+            }
+        }
+        $this->view->assign('impersonating', $impersonating);
+
         return $this->view->fetch();
+    }
+
+    /**
+     * 返回原身份（越权切换的还原）
+     */
+    public function impersonateBack()
+    {
+        $backId = \think\Session::get('impersonate_back');
+        if (!$backId) {
+            $this->error('没有可返回的身份');
+        }
+        $admin = \think\Db::name('admin')->where('id', $backId)->where('status', 'normal')->find();
+        if (!$admin) {
+            $this->error('原账号不存在或已禁用');
+        }
+        Session::delete('impersonate_back');
+        $admin['token'] = \fast\Random::uuid();
+        \think\Db::name('admin')->where('id', $admin['id'])->update(['token' => $admin['token'], 'logintime' => time(), 'loginip' => $this->request->ip()]);
+        Session::set('admin', $admin);
+        Session::set('admin.safecode', md5(md5($admin['username']) . md5(substr($admin['password'], 0, 6)) . config('token.key')));
+        $this->success('已返回原身份', 'index/index');
     }
 
     /**

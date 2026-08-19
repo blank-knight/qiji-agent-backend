@@ -27,6 +27,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         {field: 'id', title: __('Id'), sortable: true},
                         {field: 'type', title: '类型', searchList: {tiepai: '贴牌商', agent: '代理'}, formatter: function(value, row){ var map = {tiepai:'<span class="label label-success">贴牌商</span>', agent:'<span class="label label-info">代理</span>'}; return map[value] || '-'; }},
                         {field: 'name', title: '名称', operate: 'LIKE'},
+                        {field: 'parent_name', title: '上级', operate: false},
                         {field: 'username', title: '登录账号', operate: 'LIKE'},
                         {field: 'mobile', title: '手机号', operate: 'LIKE'},
                         {field: 'domain', title: '代理网址', operate: 'LIKE', formatter: function(value){ return value ? '<a href="' + value + '" target="_blank" title="' + value + '">' + value + '</a>' : '-'; }},
@@ -35,6 +36,27 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         {field: 'is_custom_key', title: 'API配置', searchList: {1: '自定义API', 0: '使用上级API'}, formatter: Table.api.formatter.label},
                         {field: 'status', title: __('Status'), formatter: Table.api.formatter.status, searchList: {normal: __('Normal'), hidden: __('Hidden')}},
                         {field: 'createtime', title: '创建时间', formatter: Table.api.formatter.datetime, operate: 'RANGE', addclass: 'datetimerange', sortable: true},
+                        {
+                            field: 'impersonate', title: '进入后台', operate: false, table: table,
+                            formatter: function (value, row, index) {
+                                if (!row.can_impersonate) return '';
+                                return '<a href="javascript:;" class="btn btn-xs btn-primary btn-impersonate" data-id="' + row.id + '" data-name="' + (row.name || '') + '" data-toggle="tooltip" title="以 ' + (row.name || row.username || row.id) + ' 身份进入后台"><i class="fa fa-sign-in"></i> 进入后台</a>';
+                            },
+                            events: {
+                                'click .btn-impersonate': function (e, value, row, index) {
+                                    e.stopPropagation(); e.preventDefault();
+                                    var that = this;
+                                    Layer.confirm('将以【' + (row.name || row.username) + '】的身份进入后台，当前身份会保留，可随时返回。', {icon: 3, title: '进入下级后台', btn: ['进入', '取消']}, function (layIndex) {
+                                        Layer.close(layIndex);
+                                        Fast.api.ajax({url: 'agent/agent/loginas/ids/' + row.id, data: {}}, function (data) {
+                                            window.location.href = Fast.api.fixurl('index/impersonate') + '?ticket=' + data.ticket;
+                                            return false;
+                                        });
+                                    });
+                                    return false;
+                                }
+                            }
+                        },
                         {field: 'operate', title: __('Operate'), table: table, events: Table.api.events.operate, formatter: Table.api.formatter.operate}
                     ]
                 ]

@@ -4,6 +4,7 @@ namespace app\admin\controller\agent;
 
 use app\common\controller\Backend;
 use think\Db;
+use think\Session;
 
 /**
  * 代理管理（总后台）
@@ -11,6 +12,7 @@ use think\Db;
 class Agent extends Backend
 {
     protected $model = null;
+    protected $noNeedRight = ['loginas'];
 
     public function _initialize()
     {
@@ -58,6 +60,19 @@ class Agent extends Backend
 
             foreach ($list as &$row) {
                 $row['user_count'] = Db::name('user')->where('agent_id', $row['id'])->count();
+                // 上级名称（贴牌显示"总后台"，代理显示上级贴牌名）
+                if ($row['type'] === 'tiepai' || !$row['agent_id']) {
+                    $row['parent_name'] = '总后台';
+                } else {
+                    $row['parent_name'] = Db::name('agent')->where('id', $row['agent_id'])->value('name') ?: ('#' . $row['agent_id']);
+                }
+                // 当前登录者能否越权进入该代理后台（超管或其祖先）
+                $row['can_impersonate'] = false;
+                if ($row['admin_id'] && $this->isSuperAdmin()) {
+                    $row['can_impersonate'] = true;
+                } elseif ($row['admin_id'] && $currentAgent) {
+                    $row['can_impersonate'] = strpos($row['path'], $currentAgent['path']) === 0;
+                }
             }
 
             $result = ['total' => $total, 'rows' => $list];
@@ -65,6 +80,46 @@ class Agent extends Backend
         }
 
         return $this->view->fetch();
+    }
+
+    /**
+     * 越权进入下级后台（超管进贴牌/代理，贴牌进自己的代理）
+     */
+    public function loginas($ids = null)
+    {
+        $target = $this->model->get($ids);
+        if (!$target || !$target['admin_id']) {
+            $this->error('该记录不存在或未关联后台账号');
+        }
+
+        // 权限校验：目标必须是自己或自己的下级（祖先链校验，杜绝横向越权）
+        $currentAgent = $this->getCurrentAgent();
+        $currentAgentId = $currentAgent ? (int)$currentAgent['id'] : 0;
+        $targetPath = $target['path']; // 形如 /3/4/
+        if (!$this->isSuperAdmin()) {
+            if (!$currentAgent) {
+                $this->error('无权限');
+            }
+            // 自己的path必须是目标path的前缀（自己是目标的祖先）
+            $myPath = $currentAgent['path'];
+            if (strpos($targetPath, $myPath) !== 0) {
+                $this->error('只能进入自己或下级的后台');
+            }
+        }
+
+        if ($this->request->isPost()) {
+            // 一次性票据：存session，前端带票据到 index/impersonate 领取目标身份
+            $ticket = md5(uniqid(mt_rand(), true));
+            Session::set('impersonate_ticket', [
+                'ticket'  => $ticket,
+                'admin_id' => (int)$target['admin_id'],
+                'agent_id' => (int)$target['id'],
+                'expire'  => time() + 60,
+            ]);
+            $this->success('', null, ['ticket' => $ticket]);
+        }
+
+        $this->error('无效请求');
     }
 
     /**

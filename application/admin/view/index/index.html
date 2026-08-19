@@ -8,6 +8,13 @@
 
         <div class="wrapper">
 
+            {if $impersonating}
+            <div style="background:#ff9800;color:#fff;padding:8px 15px;display:flex;align-items:center;justify-content:space-between;z-index:999;">
+                <div><i class="fa fa-user-secret"></i> 正在以【{$impersonating.current}】身份操作（原身份：{$impersonating.back}）</div>
+                <a href="javascript:;" id="btn-impersonate-back" class="btn btn-sm" style="background:#fff;color:#e65100;border:none;"><i class="fa fa-undo"></i> 返回原身份</a>
+            </div>
+            {/if}
+
             <!-- 头部区域 -->
             <header id="header" class="main-header">
                 {include file='common/header' /}
@@ -46,5 +53,15 @@
 
         <!-- 加载JS脚本 -->
         {include file="common/script" /}
+        {if $impersonating}
+        <script>
+            $(document).on('click', '#btn-impersonate-back', function () {
+                Fast.api.ajax({url: 'index/impersonateBack', data: {}}, function (data, ret) {
+                    window.location.href = location.pathname;
+                    return false;
+                });
+            });
+        </script>
+        {/if}
     </body>
 </html>
