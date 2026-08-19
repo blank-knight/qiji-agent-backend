@@ -36,7 +36,7 @@ class Common
                 ->column('value', 'name');
 
             foreach ($configList as $name => $value) {
-                Config::set($name, $value, 'site');
+                Config::set('site.' . $name, $value);
             }
         } catch (\Exception $e) {
             // 数据库未就绪时忽略
