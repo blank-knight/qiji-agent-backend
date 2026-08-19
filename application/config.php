@@ -298,7 +298,7 @@ return [
     //控制台配置
     'console'              => [
         'name'      => 'FastAdmin',
-        'version'   => '1.0.0',
+        'version'   => '1.0.1',
         'user'      => 'FastAdmin',
     ],
 

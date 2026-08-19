@@ -2,7 +2,7 @@
 
 return [
     'name'        => 'QIJI Agent',
-    'version'     => '1.0.0',
+    'version'     => '1.0.1',
     'cdnurl'      => '',
     'timezone'    => 'Asia/Shanghai',
     'languages'   => [],
