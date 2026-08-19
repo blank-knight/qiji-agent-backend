@@ -72,12 +72,14 @@ class Auth extends Api
             $agentId = $invite['agent_id'];
         }
 
-        // 注册用户
+        // 注册用户（赠送体验积分，可在 系统配置-体验用户积分 调整，0=不赠送）
         $auth     = AuthLib::instance();
         $username = $mobile;
+        $trialScore = (int)(config('site.trial_score') ?: 0);
         $ret      = $auth->register($username, $password, '', $mobile, [
             'agent_id'      => $agentId,
             'is_custom_key' => 0,
+            'score'         => $trialScore,
         ]);
 
         if ($ret) {
