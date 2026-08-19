@@ -160,6 +160,38 @@ define(['jquery', 'bootstrap', 'toastr', 'layer', 'lang'], function ($, undefine
                             var layerfooter = frame.find(".layer-footer");
                             Fast.api.layerfooter(layero, index, that);
 
+                            // 提前复制底栏按钮：iframe 的 load 要等子页面 CSS/JS 全部就绪（约数百毫秒），
+                            // 而 .layer-footer 的 HTML 跟表单 HTML 一同到达。这里轮询子页面 DOM，
+                            // 一解析到 .layer-footer 就立即复制，消除"弹窗先空白、按钮后闪现"的空窗。
+                            // 与 load 后的原有复制幂等（layerfooter 内部先 remove 旧 footer 再插入）。
+                            var childDoc0 = null;
+                            try {
+                                childDoc0 = $(layero).find("iframe")[0].contentDocument;
+                            } catch (e0) {
+                            }
+                            if (childDoc0 && childDoc0.querySelector && !childDoc0.querySelector(".layer-footer")) {
+                                var pollCount = 0;
+                                var pollTimer = setInterval(function () {
+                                    var doc = null;
+                                    try {
+                                        doc = $(layero).find("iframe")[0].contentDocument;
+                                    } catch (e1) {
+                                    }
+                                    if (!doc || !doc.querySelector) {
+                                        return;
+                                    }
+                                    if (doc.querySelector(".layer-footer")) {
+                                        clearInterval(pollTimer);
+                                        Fast.api.layerfooter(layero, index, that);
+                                        return;
+                                    }
+                                    // 子页面 load 完成（complete）仍无 footer = 该页面没有底栏，停止轮询
+                                    if (doc.readyState === "complete" || ++pollCount > 200) {
+                                        clearInterval(pollTimer);
+                                    }
+                                }, 30);
+                            }
+
                             //绑定事件
                             if (layerfooter.length > 0) {
                                 // 监听窗口内的元素及属性变化
