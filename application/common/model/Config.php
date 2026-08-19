@@ -22,7 +22,7 @@ class Config extends Model
      */
     public static function getGroupList()
     {
-        $list = self::field('id,name,"group",title,type,value')->select();
+        $list = self::field('id,name,`group`,title,type,value')->select();
         $groupList = [];
         foreach ($list as $k => $v) {
             $group = $v['group'];
