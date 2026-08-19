@@ -18,6 +18,7 @@ class User extends Backend
     {
         parent::_initialize();
         $this->model = new UserModel();
+        $this->view->assign('isSuperAdmin', $this->isSuperAdmin());
     }
 
     /**
@@ -81,6 +82,15 @@ class User extends Backend
                 $params['salt'] = $salt;
             }
 
+            // 归属强制：超管可从表单指定；贴牌/代理强制归属自己的agent子树（防止建出agent_id=0的"孤儿用户"只有超管可见）
+            if (!$this->isSuperAdmin()) {
+                $agent = $this->getCurrentAgent();
+                if (!$agent) {
+                    $this->error('当前账号未关联代理，无法创建用户');
+                }
+                $params['agent_id'] = $agent['id'];
+            }
+
             $params['jointime'] = time();
             $params['createtime'] = time();
             $params['updatetime'] = time();
@@ -116,6 +126,11 @@ class User extends Backend
                 $salt = \fast\Random::alnum(6);
                 $params['password'] = md5(md5($params['password']) . $salt);
                 $params['salt'] = $salt;
+            }
+
+            // 归属保护：非超管禁止修改agent_id（防把用户"挪走"出自己范围）
+            if (!$this->isSuperAdmin()) {
+                unset($params['agent_id']);
             }
 
             // 处理自定义 API Key

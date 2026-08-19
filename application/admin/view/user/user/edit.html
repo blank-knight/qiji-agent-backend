@@ -5,6 +5,7 @@
     {:token()}
     <input type="hidden" name="row[id]" value="{$row.id}">
 
+    {if condition="$isSuperAdmin"}
     <div class="form-group">
         <label for="c-agent_id" class="control-label col-xs-12 col-sm-2">上级代理ID:</label>
         <div class="col-xs-12 col-sm-8">
@@ -12,6 +13,7 @@
             <p style="margin-top: 5px;font-size: 12px;color:#888;">0是总后台的，填写其他则是对应代理的下级</p>
         </div>
     </div>
+    {/if}
 
     <div class="form-group">
         <label for="c-username" class="control-label col-xs-12 col-sm-2"><i class="red_color">*</i>{:__('Username')}:</label>

@@ -39,12 +39,14 @@
         </div>
     </div>
 
+    {if condition="$isSuperAdmin"}
     <div class="form-group">
         <label for="c-agent_id" class="control-label col-xs-12 col-sm-2">上级代理ID:</label>
         <div class="col-xs-12 col-sm-8">
             <input id="c-agent_id" class="form-control" name="row[agent_id]" type="number" value="0" placeholder="0表示直属总后台">
         </div>
     </div>
+    {/if}
 
     <div class="form-group">
         <label for="c-score" class="control-label col-xs-12 col-sm-2"><i class="red_color">*</i>积分/点数:</label>
