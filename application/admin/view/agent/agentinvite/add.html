@@ -1,6 +1,7 @@
 <form id="add-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
     {:token()}
 
+    {if $isSuperAdmin}
     <div class="form-group">
         <label for="c-agent_id" class="control-label col-xs-12 col-sm-2"><i style="color:red">*</i>所属代理ID:</label>
         <div class="col-xs-12 col-sm-4">
@@ -8,6 +9,14 @@
             <p style="margin-top: 5px;font-size: 12px;color:#888;">填写对应的代理ID</p>
         </div>
     </div>
+    {else /}
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-4">
+            <p style="margin-top:8px;font-size:13px;color:#888;">邀请码将归属到当前登录代理名下</p>
+        </div>
+    </div>
+    {/if}
 
     <div class="form-group">
         <label for="c-max_count" class="control-label col-xs-12 col-sm-2">最大使用次数:</label>

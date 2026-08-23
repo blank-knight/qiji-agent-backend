@@ -7,12 +7,9 @@ use app\common\library\Auth as AuthLib;
 use think\Db;
 use think\Validate;
 
-/**
- * 客户端认证接口
- */
 class Auth extends Api
 {
-    protected $noNeedLogin = ['login', 'register', 'activate'];
+    protected $noNeedLogin = ['login', 'register', 'activate', 'forgottip'];
     protected $noNeedRight = ['*'];
 
     public function _initialize()
@@ -104,7 +101,7 @@ class Auth extends Api
                 'user_info'     => $userInfo,
             ]);
         } else {
-            $this->error($auth->getError() ?: '注册失败');
+            $this->error($this->mapAuthError($auth->getError() ?: '注册失败'));
         }
     }
 
@@ -141,8 +138,83 @@ class Auth extends Api
                 'user_info'     => $userInfo,
             ]);
         } else {
-            $this->error($auth->getError() ?: '登录失败');
+            $this->error($this->mapAuthError($auth->getError() ?: '登录失败'));
         }
+    }
+
+    /**
+     * 忘记密码提示（无短信通道，提示文案后台可配）
+     * @ApiMethod (GET)
+     */
+    public function forgottip()
+    {
+        $tip = config('site.forgot_password_tip');
+        $this->success('', [
+            'tip' => $tip ?: '请联系客服或您的代理重置密码',
+        ]);
+    }
+
+    /**
+     * 修改密码（登录用户，Bearer token 认证）
+     * @ApiMethod (POST)
+     */
+    public function changepwd()
+    {
+        // 手动 Bearer 认证（同 Quota 控制器模式，不走 Api 基类的 session 登录检测）
+        $header = $this->request->header('authorization', '');
+        $token  = '';
+        if ($header && preg_match('/Bearer\s+(.+)/i', $header, $m)) {
+            $token = trim($m[1]);
+        }
+        if (!$token) {
+            $token = $this->request->request('token', '');
+        }
+        $auth = AuthLib::instance();
+        if (!$token || !$auth->init($token)) {
+            $this->error('请先登录', null, 401);
+        }
+
+        $oldpassword = $this->request->post('oldpassword', '');
+        $newpassword = $this->request->post('newpassword', '');
+
+        if (strlen($newpassword) < 6) {
+            $this->error('新密码长度不能少于6位');
+        }
+
+        $user = $auth->getUser();
+        if (md5(md5($oldpassword) . $user->salt) != $user->password) {
+            $this->error('原密码错误');
+        }
+
+        // Auth 库的 changepwd：内部再验一次旧密码、重新加盐加密，
+        // 并作废当前 token（改完密码需重新登录）
+        $ret = $auth->changepwd($newpassword, $oldpassword);
+        if ($ret) {
+            $this->success('密码已修改，请重新登录');
+        } else {
+            $err = $auth->getError() ?: '修改失败';
+            $this->error($err === 'Password is incorrect' ? '原密码错误' : $this->mapAuthError($err));
+        }
+    }
+
+    /**
+     * Auth 库错误消息映射为中文（面向客户端用户）
+     */
+    private function mapAuthError($error)
+    {
+        $map = [
+            'Account is incorrect'    => '账号不存在，请先注册',
+            'Account is locked'       => '账号已被锁定，请联系客服',
+            'Please try again after 1 day' => '密码错误次数过多，请 24 小时后再试',
+            'Password is incorrect'   => '密码错误',
+            'Username already exist'  => '该手机号已注册',
+            'Mobile already exist'    => '该手机号已注册',
+            'Nickname already exist'  => '该昵称已被使用',
+            'Email already exist'     => '该邮箱已被使用',
+            'Account not exist'       => '账号不存在',
+        ];
+
+        return isset($map[$error]) ? $map[$error] : $error;
     }
 
     /**

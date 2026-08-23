@@ -13,6 +13,8 @@ Route::group('api/client/v1', function () {
     Route::post('auth/register', 'api/client.Auth/register');
     Route::post('auth/login', 'api/client.Auth/login');
     Route::post('auth/activate', 'api/client.Auth/activate');
+    Route::get('auth/forgottip', 'api/client.Auth/forgottip');
+    Route::post('auth/changepwd', 'api/client.Auth/changepwd');
 
     // 额度
     Route::get('quota', 'api/client.Quota/index');
@@ -31,6 +33,8 @@ Route::group('api/client', function () {
     Route::post('auth/register', 'api/client.Auth/register');
     Route::post('auth/login', 'api/client.Auth/login');
     Route::post('auth/activate', 'api/client.Auth/activate');
+    Route::get('auth/forgottip', 'api/client.Auth/forgottip');
+    Route::post('auth/changepwd', 'api/client.Auth/changepwd');
     Route::get('quota', 'api/client.Quota/index');
     Route::post('quota/report', 'api/client.Quota/report');
     Route::get('apikey', 'api/client.Apikey/index');
