@@ -1,0 +1,49 @@
+<form id="model-config-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+    {:token()}
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">配置模式:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_radios('is_custom_key', ['0'=>'使用上级API（默认）','1'=>'自定义API'], $row['is_custom_key'])}
+            <p style="margin-top:5px;font-size:12px;color:#888;">选择「自定义API」后，旗下用户客户端将使用你在下方填写的地址与密钥；选择「使用上级API」则继承上级配置</p>
+        </div>
+    </div>
+
+    <div class="form-group" id="field-base-url">
+        <label for="c-base-url" class="control-label col-xs-12 col-sm-2">API 地址:</label>
+        <div class="col-xs-12 col-sm-6">
+            <input id="c-base-url" class="form-control" name="base_url" type="text" value="{$row.base_url}" placeholder="例如 https://www.aicps.vip/v1">
+            <p style="margin-top:5px;font-size:12px;color:#888;">OpenAI 兼容接口地址，通常以 /v1 结尾</p>
+        </div>
+    </div>
+
+    <div class="form-group" id="field-api-key">
+        <label for="c-api-key" class="control-label col-xs-12 col-sm-2">API Key:</label>
+        <div class="col-xs-12 col-sm-6">
+            <input id="c-api-key" class="form-control" name="api_key" type="text" value="{$row.api_key}" placeholder="sk-...">
+        </div>
+    </div>
+
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-primary btn-embossed disabled">保存配置</button>
+            <button type="reset" class="btn btn-default btn-embossed">重置</button>
+        </div>
+    </div>
+</form>
+
+<script>
+    // 自定义模式开关联动字段显隐（原生实现，不依赖 jQuery 加载时机）
+    (function () {
+        var form = document.getElementById('model-config-form');
+        function syncFields() {
+            var custom = form.querySelector('input[name="is_custom_key"][value="1"]').checked;
+            document.getElementById('field-base-url').style.display = custom ? '' : 'none';
+            document.getElementById('field-api-key').style.display = custom ? '' : 'none';
+        }
+        form.addEventListener('change', function (e) {
+            if (e.target && e.target.name === 'is_custom_key') syncFields();
+        });
+        syncFields();
+    })();
+</script>

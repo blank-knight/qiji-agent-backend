@@ -181,6 +181,7 @@ CREATE TABLE IF NOT EXISTS `fa_agent` (
   `admin_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '关联后台管理员ID',
   `type` varchar(20) DEFAULT 'agent' COMMENT '类型: tiepai=贴牌商, agent=代理',
   `path` varchar(500) DEFAULT '/' COMMENT '层级路径: /1/5/12/',
+  `allow_model_config` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '上级授权:是否允许自定义大模型配置:0=否,1=是',
   `username` varchar(50) DEFAULT NULL COMMENT '代理用户名',
   `name` varchar(100) DEFAULT NULL COMMENT '代理名称',
   `password` varchar(32) DEFAULT NULL COMMENT '密码',

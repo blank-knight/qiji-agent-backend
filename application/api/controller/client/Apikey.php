@@ -71,10 +71,31 @@ class Apikey extends Api
             $apiKey = config('site.default_api_key') ?: '';
         }
 
+        // base_url 沿代理继承链取（代理自定义了 API 地址则覆盖系统默认）
+        $baseUrl = config('site.default_base_url') ?: '';
+        if ($user->agent_id) {
+            $agent = Db::name('agent')->where('id', $user->agent_id)->find();
+            if ($agent) {
+                $node = $agent;
+                $checked = [];
+                while ($node && !in_array($node['id'], $checked)) {
+                    $checked[] = $node['id'];
+                    if (!empty($node['is_custom_key']) && !empty($node['base_url'])) {
+                        $baseUrl = $node['base_url'];
+                        break;
+                    }
+                    if (empty($node['agent_id'])) {
+                        break;
+                    }
+                    $node = Db::name('agent')->where('id', $node['agent_id'])->find();
+                }
+            }
+        }
+
         $this->success('', [
             'is_custom_key'  => (int)$user->is_custom_key,
             'api_key'        => $apiKey,
-            'base_url'       => config('site.default_base_url') ?: '',
+            'base_url'       => $baseUrl,
             'key_source'     => $keySource,
             'key_source_name'=> $keySourceName,
             'can_customize'  => (int)$user->is_custom_key ? true : false,

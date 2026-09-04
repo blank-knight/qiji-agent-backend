@@ -476,6 +476,14 @@ class Auth extends \fast\Auth
                 unset($ruleList[$k]);
                 continue;
             }
+            if ($v['name'] == 'agent/modelconfig') {
+                // 大模型配置菜单：仅对被上级授权（fa_agent.allow_model_config=1）的贴牌/代理显示；超管不经此入口
+                $menuAgent = \think\Db::name('agent')->where('admin_id', $this->id)->find();
+                if (!$menuAgent || empty($menuAgent['allow_model_config'])) {
+                    unset($ruleList[$k]);
+                    continue;
+                }
+            }
             if (!in_array($v['name'], $userRule)) {
                 unset($ruleList[$k]);
                 continue;

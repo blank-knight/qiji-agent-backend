@@ -128,8 +128,8 @@ class Quota extends Api
             ScoreLog::create([
                 'user_id'       => $user->id,
                 'score'         => -$deductScore,
-                'before'        => $user->score,
-                'after'         => $user->score - $deductScore,
+                'before_score'  => $user->score,
+                'after_score'   => $user->score - $deductScore,
                 'memo'          => 'Token消耗：' . $model,
                 'model'         => $model,
                 'input_tokens'  => $inputTokens,

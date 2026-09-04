@@ -67,6 +67,16 @@
         </div>
     </div>
 
+    {if $canGrantModelConfig}
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">大模型配置授权:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_radios('row[allow_model_config]', ['0'=>'禁止自定义','1'=>'允许自定义'], $row['allow_model_config'])}
+            <p style="margin-top:5px;font-size:12px;color:#888;">允许后，该{if $row.type == 'tiepai'}贴牌商及其代理{else}代理{/if}的后台侧边栏会出现「大模型配置」菜单，可自行配置API地址与密钥</p>
+        </div>
+    </div>
+    {/if}
+
     <div class="form-group">
         <label class="control-label col-xs-12 col-sm-2">{:__('Status')}:</label>
         <div class="col-xs-12 col-sm-8">

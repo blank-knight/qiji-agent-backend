@@ -24,6 +24,15 @@ Route::group('api/client/v1', function () {
     Route::get('apikey', 'api/client.Apikey/index');
     Route::post('apikey/customize', 'api/client.Apikey/customize');
 
+    // 个人中心
+    Route::get('profile/scorelogs', 'api/client.Profile/scorelogs');
+    Route::get('profile', 'api/client.Profile/index');
+    Route::post('profile/update', 'api/client.Profile/update');
+    Route::post('profile/avatar', 'api/client.Profile/avatar');
+
+    // 充值
+    Route::post('recharge/redeem', 'api/client.Recharge/redeem');
+
     // 更新检查
     Route::get('update/check', 'api/client.Update/check');
 });
@@ -39,5 +48,10 @@ Route::group('api/client', function () {
     Route::post('quota/report', 'api/client.Quota/report');
     Route::get('apikey', 'api/client.Apikey/index');
     Route::post('apikey/customize', 'api/client.Apikey/customize');
+    Route::get('profile/scorelogs', 'api/client.Profile/scorelogs');
+    Route::get('profile', 'api/client.Profile/index');
+    Route::post('profile/update', 'api/client.Profile/update');
+    Route::post('profile/avatar', 'api/client.Profile/avatar');
+    Route::post('recharge/redeem', 'api/client.Recharge/redeem');
     Route::get('update/check', 'api/client.Update/check');
 });

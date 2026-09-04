@@ -45,14 +45,21 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                             events: {
                                 'click .btn-impersonate': function (e, value, row, index) {
                                     e.stopPropagation(); e.preventDefault();
-                                    var that = this;
-                                    Layer.confirm('将以【' + (row.name || row.username) + '】的身份进入后台，当前身份会保留，可随时返回。', {icon: 3, title: '进入下级后台', btn: ['进入', '取消']}, function (layIndex) {
-                                        Layer.close(layIndex);
-                                        Fast.api.ajax({url: 'agent/agent/loginas/ids/' + row.id, data: {}}, function (data) {
-                                            window.location.href = Fast.api.fixurl('index/impersonate') + '?ticket=' + data.ticket;
+                                    // 用户手势内同步开新窗口（弹窗拦截器不会拦），票据回来后再定向；失败关窗不留空白页
+                                    var win = window.open('about:blank', '_blank');
+                                    Fast.api.ajax({url: 'agent/agent/loginas/ids/' + row.id, data: {}}, function (data) {
+                                            var url = Fast.api.fixurl('index/impersonate') + '?ticket=' + data.ticket;
+                                            try {
+                                                if (win && !win.closed) {
+                                                    win.location.href = url;
+                                                    return false;
+                                                }
+                                            } catch (e) {}
+                                            window.open(url, '_blank');
                                             return false;
+                                        }, function () {
+                                            try { if (win && !win.closed) win.close(); } catch (e) {}
                                         });
-                                    });
                                     return false;
                                 }
                             }

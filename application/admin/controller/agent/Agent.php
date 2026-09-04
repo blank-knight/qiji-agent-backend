@@ -212,6 +212,18 @@ class Agent extends Backend
             // 上级不可更改
             unset($params['agent_id']);
 
+            // 大模型配置授权：仅超管/贴牌可改；且不能给自己授权（开关只作用于下级）
+            if (isset($params['allow_model_config'])) {
+                $currentAgent = $this->getCurrentAgent();
+                if ($this->isSuperAdmin()) {
+                    // 超管对任何行均可授权
+                } elseif ($currentAgent && $currentAgent['id'] != $ids && strpos($row['path'], $currentAgent['path']) === 0) {
+                    // 贴牌/上级给自己的下级授权，合法
+                } else {
+                    unset($params['allow_model_config']);
+                }
+            }
+
             // 密码为空则不改
             if (isset($params['password']) && !$params['password']) {
                 unset($params['password']);
@@ -234,6 +246,18 @@ class Agent extends Backend
         // 补充 username 和 type_text（存在 admin 表，agent 表无此字段）
         $row['username'] = Db::name('admin')->where('id', $row['admin_id'])->value('username');
         $row['type_text'] = $row['type'] === 'tiepai' ? '贴牌商' : '代理';
+
+        // 大模型配置授权开关：超管对所有人可设；贴牌只对自己的下级可设；代理无权设置
+        $canGrantModelConfig = false;
+        if ($this->isSuperAdmin()) {
+            $canGrantModelConfig = true;
+        } else {
+            $currentAgent = $this->getCurrentAgent();
+            if ($currentAgent && $currentAgent['id'] != $ids && strpos($row['path'], $currentAgent['path']) === 0) {
+                $canGrantModelConfig = true;
+            }
+        }
+        $this->view->assign('canGrantModelConfig', $canGrantModelConfig);
 
         $this->view->assign('row', $row);
         $this->assignParentOptions();
