@@ -123,7 +123,7 @@ class Quota extends Api
 
         Db::startTrans();
         try {
-            Db::name('user')->where('id', $user->id)->setDec('score', $deductScore);
+            Db::name('user')->where('id', $user->id)->dec('score', $deductScore)->update(['last_report_time' => time()]);
 
             ScoreLog::create([
                 'user_id'       => $user->id,
