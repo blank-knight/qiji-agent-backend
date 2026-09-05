@@ -341,6 +341,9 @@ class Agent extends Backend
         $this->view->assign('api_mode', $apiMode);
         // api_key 库里是 base64，表单回显明文
         $row['api_key_plain'] = $row['api_key'] ? base64_decode($row['api_key']) : '';
+        // 敏感密钥不下发：epay_key 只留"是否已设置"标记，明文不出后端
+        $row['epay_key_set'] = $row['epay_key'] !== '' ? 1 : 0;
+        unset($row['epay_key']);
 
         $this->view->assign('row', $row);
         $this->assignParentOptions();

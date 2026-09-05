@@ -109,7 +109,7 @@ class Modelconfig extends Backend
             'models'        => $agent && isset($agent['models']) ? $agent['models'] : '',
             'epay_url'      => $agent && isset($agent['epay_url']) ? $agent['epay_url'] : '',
             'epay_pid'      => $agent && isset($agent['epay_pid']) ? $agent['epay_pid'] : '',
-            'epay_key'      => $agent && isset($agent['epay_key']) ? $agent['epay_key'] : '',
+            'epay_key_set'  => $agent && !empty($agent['epay_key']) ? 1 : 0,
         ];
         $this->view->assign('row', $row);
         return $this->view->fetch();

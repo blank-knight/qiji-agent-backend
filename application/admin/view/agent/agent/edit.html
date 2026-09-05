@@ -89,7 +89,7 @@
             <div class="form-group" style="margin-bottom:0;">
                 <label class="control-label col-xs-12 col-sm-3" style="text-align:left;">商户密钥:</label>
                 <div class="col-xs-12 col-sm-8">
-                    <input class="form-control" name="row[epay_key]" type="text" value="{$row.epay_key}" placeholder="易支付商户密钥">
+                    <input class="form-control" name="row[epay_key]" type="password" value="" placeholder="{if $row.epay_key_set}已设置（留空=不修改）{else}易支付商户密钥{/if}">
                 </div>
             </div>
         </div>

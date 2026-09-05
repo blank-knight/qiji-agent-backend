@@ -70,6 +70,10 @@ class Config extends Backend
                 $value['value'] = json_encode($dictValue, JSON_UNESCAPED_UNICODE);
             }
             $value['tip'] = htmlspecialchars($value['tip']);
+            // 敏感密钥打码：后台不回显明文（防同级管理员互相窥视），保存时留空/保持掩码=不改
+            if (in_array($value['name'], ['epay_key', 'default_api_key']) && $value['value'] !== '') {
+                $value['value'] = '******';
+            }
             if ($value['name'] == 'cdnurl') {
                 //cdnurl不支持在线修改
                 continue;
@@ -141,6 +145,10 @@ class Config extends Backend
                 foreach ($this->model->all() as $v) {
                     if (isset($row[$v['name']])) {
                         $value = $row[$v['name']];
+                        // 敏感密钥：留空或保持掩码 = 不修改（沿用库中原值）
+                        if (in_array($v['name'], ['epay_key', 'default_api_key']) && ($value === '' || $value === '******')) {
+                            continue;
+                        }
                         if (is_array($value) && isset($value['field'])) {
                             $value = json_encode(ConfigModel::getArrayData($value), JSON_UNESCAPED_UNICODE);
                         } else {
