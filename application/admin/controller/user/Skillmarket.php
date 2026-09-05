@@ -62,20 +62,25 @@ class Skillmarket extends Backend
         // 上传 zip（可选：编辑时不传则保留旧文件）
         $file = $this->request->file('file');
         if ($file) {
-            // move 到临时子目录（TP5 自动命名），校验后 rename 为规范文件名
-            $tmpDir = ROOT_PATH . 'public/downloads/skills/.tmp';
-            if (!is_dir($tmpDir)) {
-                @mkdir($tmpDir, 0755, true);
+            // 绕开 TP5 File::move 的路径怪癖：直接从临时上传流写出
+            $upFile = $_FILES['file'] ?? null;
+            if (!$upFile || ($upFile['error'] ?? 1) !== UPLOAD_ERR_OK) {
+                $this->error('zip 上传失败（PHP 上传错误 ' . ($upFile['error'] ?? 'n/a') . '）');
             }
-            $info = $file->validate(['size' => 50 * 1024 * 1024, 'ext' => 'zip'])->move($tmpDir);
-            if (!$info) {
-                $this->error('zip 上传失败：' . $file->getError());
+            if ($upFile['size'] > 50 * 1024 * 1024) {
+                $this->error('zip 超过 50MB 限制');
             }
-            $savedPath = $info->getRealPath();
+            if (!preg_match('/\.zip$/i', $upFile['name'])) {
+                $this->error('仅支持 zip 文件');
+            }
+            $dir = ROOT_PATH . 'public/downloads/skills/';
+            if (!is_dir($dir)) {
+                @mkdir($dir, 0755, true);
+            }
             $filename  = strtolower($name) . '-' . $ver . '.zip';
-            $dest      = ROOT_PATH . 'public/downloads/skills/' . $filename;
-            if (!@rename($savedPath, $dest)) {
-                $this->error('保存文件失败');
+            $dest      = $dir . $filename;
+            if (!@move_uploaded_file($upFile['tmp_name'], $dest)) {
+                $this->error('保存文件失败（目录不可写？）');
             }
             // zip 内容校验：必须包含 SKILL.md（根级或一级子目录）
             $hasSkillMd = false;
