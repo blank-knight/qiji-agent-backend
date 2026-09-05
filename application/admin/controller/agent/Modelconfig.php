@@ -37,6 +37,7 @@ class Modelconfig extends Backend
         if ($this->request->isPost()) {
             $baseUrl = trim($this->request->post('base_url', ''));
             $apiKey  = trim($this->request->post('api_key', ''));
+            $models  = trim($this->request->post('models', ''));
             $useCustom = (int)$this->request->post('is_custom_key', 0);
 
             if ($useCustom) {
@@ -48,6 +49,20 @@ class Modelconfig extends Backend
                 }
             }
 
+            // 模型列表：中英文逗号分隔 → 归一化（去空格/去重/过滤非法字符），上限 50 个
+            $modelList = [];
+            foreach (preg_split('/[,，]/u', $models) as $m) {
+                $m = trim($m);
+                if ($m === '' || strlen($m) > 100 || !preg_match('/^[\w.\-:\/]+$/u', $m)) {
+                    continue;
+                }
+                $modelList[$m] = true;
+            }
+            $modelList = array_keys($modelList);
+            if (count($modelList) > 50) {
+                $this->error('模型数量最多 50 个');
+            }
+
             $update = [
                 'is_custom_key' => $useCustom ? 1 : 0,
                 'updatetime'    => time(),
@@ -57,6 +72,10 @@ class Modelconfig extends Backend
                     $update['base_url'] = rtrim($baseUrl, '/');
                 }
                 $update['api_key'] = base64_encode($apiKey);
+                $update['models'] = implode(',', $modelList);
+            } else {
+                // 回退上级API时清掉自定义模型（跟随继承链）
+                $update['models'] = '';
             }
 
             $agent = $this->getCurrentAgent();
@@ -70,6 +89,7 @@ class Modelconfig extends Backend
             'is_custom_key' => $agent ? $agent['is_custom_key'] : 0,
             'base_url'      => $agent && isset($agent['base_url']) ? $agent['base_url'] : '',
             'api_key'       => $agent && $agent['api_key'] ? base64_decode($agent['api_key']) : '',
+            'models'        => $agent && isset($agent['models']) ? $agent['models'] : '',
         ];
         $this->view->assign('row', $row);
         return $this->view->fetch();

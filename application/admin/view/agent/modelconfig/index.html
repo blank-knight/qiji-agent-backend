@@ -23,6 +23,14 @@
         </div>
     </div>
 
+    <div class="form-group" id="field-models">
+        <label for="c-models" class="control-label col-xs-12 col-sm-2">可用模型:</label>
+        <div class="col-xs-12 col-sm-6">
+            <input id="c-models" class="form-control" name="models" type="text" value="{$row.models}" placeholder="如 gpt-4o,gpt-4o-mini,claude-3-5-sonnet">
+            <p style="margin-top:5px;font-size:12px;color:#888;">逗号分隔，旗下用户客户端只能使用这些模型（第一个为默认模型）；留空则不限制</p>
+        </div>
+    </div>
+
     <div class="form-group layer-footer">
         <label class="control-label col-xs-12 col-sm-2"></label>
         <div class="col-xs-12 col-sm-8">
@@ -40,6 +48,7 @@
             var custom = form.querySelector('input[name="is_custom_key"][value="1"]').checked;
             document.getElementById('field-base-url').style.display = custom ? '' : 'none';
             document.getElementById('field-api-key').style.display = custom ? '' : 'none';
+            document.getElementById('field-models').style.display = custom ? '' : 'none';
         }
         form.addEventListener('change', function (e) {
             if (e.target && e.target.name === 'is_custom_key') syncFields();

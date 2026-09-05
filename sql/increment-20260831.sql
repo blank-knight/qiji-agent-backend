@@ -14,3 +14,8 @@ CREATE TABLE IF NOT EXISTS `fa_recharge_code` (
   KEY `agent_id` (`agent_id`),
   KEY `used_by` (`used_by`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='充值码表';
+
+-- 2026-09-05 追加：fa_agent.models（自定义可用模型列表）
+SET @col := (SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='fa_agent' AND COLUMN_NAME='models');
+SET @sql := IF(@col=0, "ALTER TABLE `fa_agent` ADD COLUMN `models` varchar(2000) NOT NULL DEFAULT '' COMMENT '自定义可用模型列表(逗号分隔,空=不限制)' AFTER `base_url`", "SELECT 'skip models'");
+PREPARE s FROM @sql; EXECUTE s; DEALLOCATE PREPARE s;

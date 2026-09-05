@@ -95,6 +95,7 @@ class Auth extends Api
                 'username'      => $userInfo['username'],
                 'api_key'       => $apiKeyInfo['api_key'],
                 'base_url'      => $apiKeyInfo['base_url'],
+                'models'        => $apiKeyInfo['models'],
                 'is_custom_key' => $userInfo['is_custom_key'],
                 'score'         => $userInfo['score'],
                 'mode'          => $userInfo['mode'],
@@ -132,6 +133,7 @@ class Auth extends Api
                 'username'      => $userInfo['username'],
                 'api_key'       => $apiKeyInfo['api_key'],
                 'base_url'      => $apiKeyInfo['base_url'],
+                'models'        => $apiKeyInfo['models'],
                 'is_custom_key' => $userInfo['is_custom_key'],
                 'score'         => $userInfo['score'],
                 'mode'          => $userInfo['mode'],
@@ -296,6 +298,7 @@ class Auth extends Api
         $apiKey    = '';
         $keySource = 'system';
         $baseUrl   = config('site.default_base_url') ?: '';
+        $models    = [];
 
         if ($user->is_custom_key && $user->api_key_encrypted) {
             $apiKey    = base64_decode($user->api_key_encrypted);
@@ -306,6 +309,7 @@ class Auth extends Api
                 $apiKey    = base64_decode($agent['api_key']);
                 $keySource = $agent['type'] === 'tiepai' ? 'tiepai' : 'agent';
                 $baseUrl   = $this->pickAgentBaseUrl($agent, $baseUrl);
+                $models    = $this->pickAgentModels($agent);
             } else {
                 // 沿 path 逐级向上查找
                 $pathParts = array_filter(explode('/', trim($agent['path'] ?? '', '/')));
@@ -321,8 +325,9 @@ class Auth extends Api
                         break;
                     }
                 }
-                // base_url 独立沿继承链取：最近一个「自定义模式且配了地址」的节点
+                // base_url/models 独立沿继承链取：最近一个「自定义模式且配了地址」的节点
                 $baseUrl = $this->pickAgentBaseUrl($agent, $baseUrl);
+                $models  = $this->pickAgentModels($agent);
             }
         }
 
@@ -330,7 +335,7 @@ class Auth extends Api
             $apiKey = config('site.default_api_key') ?: '';
         }
 
-        return ['api_key' => $apiKey, 'key_source' => $keySource, 'base_url' => $baseUrl];
+        return ['api_key' => $apiKey, 'key_source' => $keySource, 'base_url' => $baseUrl, 'models' => $models];
     }
 
     /**
@@ -352,5 +357,27 @@ class Auth extends Api
             $node = Db::name('agent')->where('id', $node['agent_id'])->find();
         }
         return $fallback;
+    }
+
+    /**
+     * 沿代理链取第一个 is_custom_key=1 且 models 非空的模型列表（与 base_url 同节点判定）；
+     * 返回数组（空数组=未配置，不限制）
+     */
+    private function pickAgentModels($agent)
+    {
+        $node = $agent;
+        $checked = [];
+        while ($node && !in_array($node['id'], $checked)) {
+            $checked[] = $node['id'];
+            if (!empty($node['is_custom_key']) && !empty($node['models'])) {
+                $list = array_filter(array_map('trim', preg_split('/[,，]/u', $node['models'])));
+                return $list ? array_values($list) : [];
+            }
+            if (empty($node['agent_id'])) {
+                break;
+            }
+            $node = Db::name('agent')->where('id', $node['agent_id'])->find();
+        }
+        return [];
     }
 }
