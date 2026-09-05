@@ -123,7 +123,8 @@ class Quota extends Api
 
         Db::startTrans();
         try {
-            Db::name('user')->where('id', $user->id)->dec('score', $deductScore)->update(['last_report_time' => time()]);
+            // 原子扣分+刷新上报时间（一条SQL，避免 dec+update 链式歧义）
+            Db::execute('UPDATE fa_user SET score = score - ?, last_report_time = ? WHERE id = ?', [$deductScore, time(), $user->id]);
 
             ScoreLog::create([
                 'user_id'       => $user->id,
