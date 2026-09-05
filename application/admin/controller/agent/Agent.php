@@ -128,6 +128,71 @@ class Agent extends Backend
     /**
      * 添加
      */
+
+    /**
+     * API配置三选一（编辑/新增共用）：
+     *   inherit=使用上级(默认) custom=由我指定 self=允许其自行配置
+     * 映射：is_custom_key = (mode==custom) ；allow_model_config = (mode==self)
+     * self 时保留已填的 custom 字段作兜底（不覆盖不清空）
+     * api_key 统一 base64 入库（与 Modelconfig 页一致，读取端统一 base64_decode）
+     * models 归一化：中英逗号切分/trim/滤非法/去重/上限50，英文逗号join
+     */
+    private function applyApiMode(array &$params, $existing = null)
+    {
+        $mode = isset($params['api_mode']) ? $params['api_mode'] : 'inherit';
+        unset($params['api_mode']);
+
+        // 允许自行配置的授权校验（沿用原 allow_model_config 规则：仅超管或直系上级）
+        if ($mode === 'self') {
+            if (!$this->isSuperAdmin()) {
+                $currentAgent = $this->getCurrentAgent();
+                $targetPath = $existing ? $existing['path'] : '';
+                if (!($currentAgent && $targetPath && strpos($targetPath, $currentAgent['path']) === 0)) {
+                    $mode = 'inherit'; // 无权授权则回落默认
+                }
+            }
+        }
+
+        if ($mode === 'custom') {
+            $params['is_custom_key'] = 1;
+            $params['allow_model_config'] = $existing ? ($existing['allow_model_config'] ? 1 : 0) : 0;
+            // api_key base64
+            if (isset($params['api_key']) && $params['api_key'] !== '') {
+                $params['api_key'] = base64_encode(trim($params['api_key']));
+            } else {
+                unset($params['api_key']); // 留空=不动已有
+            }
+            // models 归一化
+            $models = isset($params['models']) ? trim($params['models']) : '';
+            if ($models === '') {
+                unset($params['models']);
+            } else {
+                $list = preg_split('/[,，]/u', $models);
+                $list = array_filter(array_map(function ($m) {
+                    $m = trim($m);
+                    return preg_match('/^[\w.:-]{1,100}$/', $m) ? $m : '';
+                }, $list));
+                $list = array_values(array_unique($list));
+                if (count($list) > 50) {
+                    $list = array_slice($list, 0, 50);
+                }
+                $params['models'] = $list ? implode(',', $list) : '';
+            }
+        } elseif ($mode === 'self') {
+            $params['allow_model_config'] = 1;
+            $params['is_custom_key'] = $existing ? ($existing['is_custom_key'] ? 1 : 0) : 0;
+            // custom 字段保留兜底：不修改 base_url/api_key/models
+            unset($params['base_url'], $params['api_key'], $params['models']);
+        } else {
+            // inherit：回到默认——清自定义
+            $params['is_custom_key'] = 0;
+            $params['allow_model_config'] = 0;
+            $params['base_url'] = '';
+            $params['api_key'] = '';
+            $params['models'] = '';
+        }
+    }
+
     public function add()
     {
         if ($this->request->isPost()) {
@@ -155,6 +220,9 @@ class Agent extends Backend
             if (isset($params['type']) && $params['type'] === 'tiepai') {
                 $params['agent_id'] = 0;
             }
+
+            // API配置三选一映射
+            $this->applyApiMode($params);
 
             // 密码加密
             if (isset($params['password']) && $params['password']) {
@@ -194,6 +262,17 @@ class Agent extends Backend
 
         // 准备上级选项
         $this->assignParentOptions();
+        // 新增页授权开关：超管恒可；贴牌建自己下级可（POST 已强校验归属）
+        $canGrantModelConfig = false;
+        if ($this->isSuperAdmin()) {
+            $canGrantModelConfig = true;
+        } else {
+            $currentAgent = $this->getCurrentAgent();
+            if ($currentAgent) {
+                $canGrantModelConfig = true;
+            }
+        }
+        $this->view->assign('canGrantModelConfig', $canGrantModelConfig);
         return $this->view->fetch();
     }
 
@@ -215,17 +294,8 @@ class Agent extends Backend
             // 上级不可更改
             unset($params['agent_id']);
 
-            // 大模型配置授权：仅超管/贴牌可改；且不能给自己授权（开关只作用于下级）
-            if (isset($params['allow_model_config'])) {
-                $currentAgent = $this->getCurrentAgent();
-                if ($this->isSuperAdmin()) {
-                    // 超管对任何行均可授权
-                } elseif ($currentAgent && $currentAgent['id'] != $ids && strpos($row['path'], $currentAgent['path']) === 0) {
-                    // 贴牌/上级给自己的下级授权，合法
-                } else {
-                    unset($params['allow_model_config']);
-                }
-            }
+            // API配置三选一映射（含 allow_model_config 授权校验）
+            $this->applyApiMode($params, $row);
 
             // 密码为空则不改
             if (isset($params['password']) && !$params['password']) {
@@ -261,6 +331,17 @@ class Agent extends Backend
             }
         }
         $this->view->assign('canGrantModelConfig', $canGrantModelConfig);
+
+        // API配置三选一回显：self 优先于 custom（都开时显示 self，custom 字段保留兜底）
+        $apiMode = 'inherit';
+        if (!empty($row['allow_model_config'])) {
+            $apiMode = 'self';
+        } elseif (!empty($row['is_custom_key'])) {
+            $apiMode = 'custom';
+        }
+        $this->view->assign('api_mode', $apiMode);
+        // api_key 库里是 base64，表单回显明文
+        $row['api_key_plain'] = $row['api_key'] ? base64_decode($row['api_key']) : '';
 
         $this->view->assign('row', $row);
         $this->assignParentOptions();
