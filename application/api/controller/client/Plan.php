@@ -247,7 +247,8 @@ class Plan extends Api
      */
     public function notify()
     {
-        $params = $this->request->get();
+        // 易支付以 POST 通知，参数在 body；部分网关用 GET——两者合并取值
+        $params = array_merge($this->request->get(), $this->request->post());
         $sign = $params['sign'] ?? '';
         unset($params['sign'], $params['sign_type']);
         ksort($params);
