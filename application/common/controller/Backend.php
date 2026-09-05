@@ -286,6 +286,12 @@ class Backend extends Controller
 
         // 将前端 require-backend.js 依赖的站点配置赋值给模板
         $siteConfig = \think\Config::get('site') ?: [];
+        // 敏感密钥不注入前端（window.Config.site 会全量落到每个页面的 JS 里）
+        foreach (['epay_key', 'default_api_key'] as $secretKey) {
+            if (isset($siteConfig[$secretKey]) && $siteConfig[$secretKey] !== '') {
+                $siteConfig[$secretKey] = '******';
+            }
+        }
         $site = array_merge([
             'name'            => \think\Config::get('site.name') ?: 'FastAdmin',
             'version'         => \think\Config::get('site.version') ?: '1.0.0',
