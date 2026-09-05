@@ -62,7 +62,12 @@ class Skillmarket extends Backend
         // 上传 zip（可选：编辑时不传则保留旧文件）
         $file = $this->request->file('file');
         if ($file) {
-            $info = $file->validate(['size' => 50 * 1024 * 1024, 'ext' => 'zip'])->move(ROOT_PATH . 'public/downloads/skills', '');
+            // move 到临时子目录（TP5 自动命名），校验后 rename 为规范文件名
+            $tmpDir = ROOT_PATH . 'public/downloads/skills/.tmp';
+            if (!is_dir($tmpDir)) {
+                @mkdir($tmpDir, 0755, true);
+            }
+            $info = $file->validate(['size' => 50 * 1024 * 1024, 'ext' => 'zip'])->move($tmpDir);
             if (!$info) {
                 $this->error('zip 上传失败：' . $file->getError());
             }
