@@ -114,5 +114,66 @@ class Modelconfig extends Backend
         $this->view->assign('row', $row);
         return $this->view->fetch();
     }
-}
+    /**
+     * 检测可用模型：服务端代理请求 {base_url}/models，返回模型列表
+     * POST base_url, api_key(留空=用已保存的)
+     */
+    public function fetchmodels()
+    {
+        if (!$this->request->isPost()) {
+            $this->error('非法请求');
+        }
+        $baseUrl = rtrim(trim($this->request->post('base_url', '')), '/');
+        $apiKey  = trim($this->request->post('api_key', ''));
+        $agentId = session('agent.id');
 
+        // key 留空则用库中已存的（自助场景：只想重新检测）
+        if ($apiKey === '' && $agentId) {
+            $saved = Db::name('agent')->where('id', $agentId)->value('api_key');
+            $apiKey = $saved ? base64_decode($saved) : '';
+        }
+        if (!$apiKey) {
+            $this->error('请先填写 API Key');
+        }
+        if (!preg_match('#^https?://#i', $baseUrl)) {
+            $this->error('API 地址无效（需以 http/https 开头）');
+        }
+        // /models 端点：地址带 /v1 则直接拼，否则补 /v1
+        $url = $baseUrl . (preg_match('#/v\d+$#i', $baseUrl) ? '' : '/v1') . '/models';
+
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => 15,
+            CURLOPT_HTTPHEADER     => ['Authorization: Bearer ' . $apiKey],
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => 0,
+        ]);
+        $body = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $err = curl_error($ch);
+        curl_close($ch);
+
+        if ($err) {
+            $this->error('连接失败：' . $err);
+        }
+        if ($httpCode !== 200) {
+            $hint = $httpCode === 401 ? '（Key 无效或未授权）' : '';
+            $this->error('接口返回 HTTP ' . $httpCode . $hint);
+        }
+        $data = json_decode($body, true);
+        $ids = [];
+        if (isset($data['data']) && is_array($data['data'])) {
+            foreach ($data['data'] as $m) {
+                if (!empty($m['id'])) {
+                    $ids[] = $m['id'];
+                }
+            }
+        }
+        if (!$ids) {
+            $this->error('未发现可用模型（响应格式异常）');
+        }
+        sort($ids);
+        $this->success('', ['models' => array_values(array_unique($ids)), 'count' => count($ids)]);
+    }
+}

@@ -26,8 +26,19 @@
     <div class="form-group" id="field-models">
         <label for="c-models" class="control-label col-xs-12 col-sm-2">可用模型:</label>
         <div class="col-xs-12 col-sm-6">
-            <input id="c-models" class="form-control" name="models" type="text" value="{$row.models}" placeholder="如 gpt-4o,gpt-4o-mini,claude-3-5-sonnet">
-            <p style="margin-top:5px;font-size:12px;color:#888;">逗号分隔，旗下用户客户端只能使用这些模型（第一个为默认模型）；留空则不限制</p>
+            <div style="display:flex;gap:8px;">
+                <input id="c-models" class="form-control" name="models" type="text" value="{$row.models}" placeholder="如 gpt-4o,gpt-4o-mini,claude-3-5-sonnet">
+                <button type="button" id="btn-fetch-models" class="btn btn-info" style="white-space:nowrap;">检测模型</button>
+            </div>
+            <div id="model-pick-area" style="display:none;margin-top:8px;border:1px solid #e5e5e5;border-radius:4px;padding:8px;max-height:220px;overflow-y:auto;background:#fafafa;">
+                <div style="margin-bottom:6px;">
+                    <label style="font-weight:normal;"><input type="checkbox" id="chk-all-models"> 全选</label>
+                    <span id="model-fetch-info" style="color:#888;font-size:12px;margin-left:8px;"></span>
+                </div>
+                <div id="model-pick-list"></div>
+                <button type="button" id="btn-apply-models" class="btn btn-success btn-sm" style="margin-top:6px;">填入所选</button>
+            </div>
+            <p style="margin-top:5px;font-size:12px;color:#888;">逗号分隔，旗下用户客户端只能使用这些模型（第一个为默认模型）；留空则不限制。填写地址和Key后可点「检测模型」自动获取</p>
         </div>
     </div>
 
@@ -80,4 +91,83 @@
         });
         syncFields();
     })();
+</script>
+
+<script>
+(function () {
+    var btn = document.getElementById('btn-fetch-models');
+    if (!btn) return;
+    var area = document.getElementById('model-pick-area');
+    var list = document.getElementById('model-pick-list');
+    var info = document.getElementById('model-fetch-info');
+    var modelsInput = document.getElementById('c-models');
+    var baseUrlInput = document.getElementById('c-base-url');
+    var apiKeyInput = document.getElementById('c-api-key');
+
+    function getToken() {
+        var el = document.querySelector('input[name="__token__"]');
+        return el ? el.value : '';
+    }
+
+    btn.addEventListener('click', function () {
+        var baseUrl = baseUrlInput ? baseUrlInput.value.trim() : '';
+        var apiKey = apiKeyInput ? apiKeyInput.value.trim() : '';
+        if (!baseUrl) { alert('请先填写 API 地址'); return; }
+        if (!apiKey) { if (!confirm('API Key 为空，将尝试使用已保存的 Key 检测，继续？')) return; }
+
+        btn.disabled = true;
+        btn.textContent = '检测中…';
+        info.textContent = '';
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', location.pathname.replace(/\/index$/, '') + '/fetchmodels', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState !== 4) return;
+            btn.disabled = false;
+            btn.textContent = '检测模型';
+            var ret;
+            try { ret = JSON.parse(xhr.responseText); } catch (e) { alert('响应异常'); return; }
+            if (ret.code !== 1) { alert('检测失败：' + (ret.msg || '未知错误')); return; }
+            var models = (ret.data && ret.data.models) || [];
+            info.textContent = '发现 ' + models.length + ' 个模型，勾选后点「填入所选」';
+            list.innerHTML = '';
+            var selected = modelsInput.value.split(',').map(function (x) { return x.trim(); }).filter(Boolean);
+            models.forEach(function (m) {
+                var lab = document.createElement('label');
+                lab.style.cssText = 'display:inline-block;margin:2px 10px 2px 0;font-weight:normal;';
+                var cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.value = m;
+                cb.className = 'model-chk';
+                if (selected.indexOf(m) >= 0) cb.checked = true;
+                lab.appendChild(cb);
+                lab.appendChild(document.createTextNode(' ' + m));
+                list.appendChild(lab);
+            });
+            area.style.display = 'block';
+        };
+        xhr.send('base_url=' + encodeURIComponent(baseUrl) + '&api_key=' + encodeURIComponent(apiKey) + '&__token__=' + encodeURIComponent(getToken()));
+    });
+
+    var chkAll = document.getElementById('chk-all-models');
+    if (chkAll) {
+        chkAll.addEventListener('change', function () {
+            var cbs = list.querySelectorAll('input.model-chk');
+            for (var i = 0; i < cbs.length; i++) cbs[i].checked = chkAll.checked;
+        });
+    }
+
+    var applyBtn = document.getElementById('btn-apply-models');
+    if (applyBtn) {
+        applyBtn.addEventListener('click', function () {
+            var cbs = list.querySelectorAll('input.model-chk:checked');
+            var picked = [];
+            for (var i = 0; i < cbs.length; i++) picked.push(cbs[i].value);
+            if (!picked.length) { alert('请至少勾选一个模型'); return; }
+            modelsInput.value = picked.join(',');
+        });
+    }
+})();
 </script>
