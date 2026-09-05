@@ -58,7 +58,8 @@ class Scoreplan extends Backend
     private function getScopeAgentIds()
     {
         if ($this->isSuperAdmin()) {
-            return Db::name('agent')->column('id');
+            // 超管可见全部：含平台套餐(agent_id=0)
+            return array_merge([0], array_map('intval', Db::name('agent')->column('id')));
         }
         $currentAgent = $this->getCurrentAgent();
         if (!$currentAgent) {
