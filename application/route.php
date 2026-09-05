@@ -38,6 +38,8 @@ Route::group('api/client/v1', function () {
     Route::post('plan/order', 'api/client.Plan/order');
     Route::get('plan/status', 'api/client.Plan/status');
     Route::any('plan/notify', 'api/client.Plan/notify');
+    Route::get('skill/list', 'api/client.Skill/list');
+    Route::get('skill/download', 'api/client.Skill/download');
     Route::any('plan/return', 'api/client.Plan/orderreturn');
 
     // 更新检查
