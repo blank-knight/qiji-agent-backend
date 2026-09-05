@@ -78,6 +78,23 @@ class Modelconfig extends Backend
                 $update['models'] = '';
             }
 
+            // 在线收款自助配置：与 API 模式独立；密钥留空=不修改
+            $epayUrl = trim($this->request->post('epay_url', null));
+            $epayPid = trim($this->request->post('epay_pid', null));
+            $epayKey = trim($this->request->post('epay_key', ''));
+            if ($epayUrl !== null) {
+                if ($epayUrl !== '' && !preg_match('#^https?://#i', $epayUrl)) {
+                    $this->error('收款网关地址必须以 http:// 或 https:// 开头');
+                }
+                $update['epay_url'] = rtrim($epayUrl, '/');
+            }
+            if ($epayPid !== null) {
+                $update['epay_pid'] = $epayPid;
+            }
+            if ($epayKey !== '') {
+                $update['epay_key'] = $epayKey;
+            }
+
             $agent = $this->getCurrentAgent();
             Db::name('agent')->where('id', $agent['id'])->update($update);
 
@@ -90,6 +107,9 @@ class Modelconfig extends Backend
             'base_url'      => $agent && isset($agent['base_url']) ? $agent['base_url'] : '',
             'api_key'       => $agent && $agent['api_key'] ? base64_decode($agent['api_key']) : '',
             'models'        => $agent && isset($agent['models']) ? $agent['models'] : '',
+            'epay_url'      => $agent && isset($agent['epay_url']) ? $agent['epay_url'] : '',
+            'epay_pid'      => $agent && isset($agent['epay_pid']) ? $agent['epay_pid'] : '',
+            'epay_key'      => $agent && isset($agent['epay_key']) ? $agent['epay_key'] : '',
         ];
         $this->view->assign('row', $row);
         return $this->view->fetch();
