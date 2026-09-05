@@ -203,7 +203,8 @@ class Plan extends Api
             'sitename'     => 'Token充值',
         ];
         ksort($params);
-        $signStr = http_build_query($params);
+        // ezfp 等魔改易支付：签名串原样拼接（不做 urlencode），标准易支付同为该形式可兼容
+        $signStr = urldecode(http_build_query($params));
         $sign = md5($signStr . $payOwner['epay_key']);
         $params['sign'] = $sign;
         $params['sign_type'] = 'MD5';
@@ -251,8 +252,10 @@ class Plan extends Api
         $params = array_merge($this->request->get(), $this->request->post());
         $sign = $params['sign'] ?? '';
         unset($params['sign'], $params['sign_type']);
+        // 空值参数不参与签名（易支付惯例），签名串原样拼接（与下单侧一致）
+        $params = array_filter($params, function ($v) { return $v !== '' && $v !== null; });
         ksort($params);
-        $signStr = http_build_query($params);
+        $signStr = urldecode(http_build_query($params));
 
         $orderNo = $params['out_trade_no'] ?? '';
         $order = Db::name('score_order')->where('order_no', $orderNo)->find();
