@@ -36,7 +36,7 @@ class Index extends Backend
         // 一次性：先删再验，防并发重放
         \think\Db::name('impersonate_ticket')->where('ticket', $ticket)->delete();
 
-        $admin = \think\Db::name('admin')->where('id', $info['admin_id'])->where('status', 'normal')->find();
+        $admin = \think\Db::name('admin')->where('id', $info['to_admin'])->where('status', 'normal')->find();
         if (!$admin) {
             $this->error('目标账号不存在或已禁用');
         }
