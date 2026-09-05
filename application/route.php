@@ -37,7 +37,7 @@ Route::group('api/client/v1', function () {
     Route::get('plan/index', 'api/client.Plan/index');
     Route::post('plan/order', 'api/client.Plan/order');
     Route::get('plan/status', 'api/client.Plan/status');
-    Route::get('plan/notify', 'api/client.Plan/notify');
+    Route::any('plan/notify', 'api/client.Plan/notify');
     Route::any('plan/return', 'api/client.Plan/orderreturn');
 
     // 更新检查
