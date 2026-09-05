@@ -108,15 +108,18 @@ class Agent extends Backend
         }
 
         if ($this->request->isPost()) {
-            // 一次性票据：存session，前端带票据到 index/impersonate 领取目标身份
+            // 一次性票据：写数据库（新标签走 imp.php 独立会话，session 不可跨会话读）
+            // 单发短时效：60 秒内未领取即作废；领取即删。
             $ticket = md5(uniqid(mt_rand(), true));
-            Session::set('impersonate_ticket', [
-                'ticket'  => $ticket,
-                'admin_id' => (int)$target['admin_id'],
-                'agent_id' => (int)$target['id'],
-                'expire'  => time() + 60,
+            Db::name('impersonate_ticket')->insert([
+                'ticket'    => $ticket,
+                'from_admin' => (int)$this->auth->id,
+                'to_admin'  => (int)$target['admin_id'],
+                'agent_id'  => (int)$target['id'],
+                'createtime' => time(),
+                'expiretime' => time() + 60,
             ]);
-            $this->success('', null, ['ticket' => $ticket]);
+            $this->success('', null, ['ticket' => $ticket, 'entry' => 'imp.php']);
         }
 
         $this->error('无效请求');

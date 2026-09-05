@@ -292,7 +292,9 @@ class Backend extends Controller
             'cdnurl'          => \think\Config::get('site.cdnurl') ?: '',
             'timezone'        => \think\Config::get('site.timezone') ?: 'Asia/Shanghai',
             'language'        => $lang ?: 'zh-cn',
-            'moduleurl'       => 'admin.php',
+            // imp.php 入口（下级后台隔离会话）下所有前端 URL 必须仍指向本入口，
+            // 否则一次菜单跳转就落回 admin.php 共享会话、隔离失效
+            'moduleurl'       => preg_match('#/imp\.php#i', request()->baseFile() ?? '') ? 'imp.php' : 'admin.php',
             'controllername'  => $controllername,
             'actionname'      => $actionname,
             'jsname'          => 'backend/' . str_replace('.', '/', $controllername),

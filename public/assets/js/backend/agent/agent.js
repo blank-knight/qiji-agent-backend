@@ -48,7 +48,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                                     // 用户手势内同步开新窗口（弹窗拦截器不会拦），票据回来后再定向；失败关窗不留空白页
                                     var win = window.open('about:blank', '_blank');
                                     Fast.api.ajax({url: 'agent/agent/loginas/ids/' + row.id, data: {}}, function (data) {
-                                            var url = Fast.api.fixurl('index/impersonate') + '?ticket=' + data.ticket;
+                                            var url = '/imp.php/index/impersonate?ticket=' + data.ticket;
                                             try {
                                                 if (win && !win.closed) {
                                                     win.location.href = url;

@@ -28,11 +28,13 @@ class Index extends Backend
         if (!$ticket) {
             $this->error('缺少票据');
         }
-        $info = Session::get('impersonate_ticket');
-        Session::delete('impersonate_ticket');
-        if (!$info || $info['ticket'] !== $ticket || $info['expire'] < time()) {
+        // 票据在数据库（跨会话领取：新标签 imp.php 独立 session 拿不到主会话）
+        $info = \think\Db::name('impersonate_ticket')->where('ticket', $ticket)->find();
+        if (!$info || $info['expiretime'] < time()) {
             $this->error('票据无效或已过期');
         }
+        // 一次性：先删再验，防并发重放
+        \think\Db::name('impersonate_ticket')->where('ticket', $ticket)->delete();
 
         $admin = \think\Db::name('admin')->where('id', $info['admin_id'])->where('status', 'normal')->find();
         if (!$admin) {
@@ -40,8 +42,12 @@ class Index extends Backend
         }
 
         // 记录切换前的身份，供"返回原身份"使用
+        // 隔离会话（imp.php）里当前无身份：back = 票据发起者
         $previous = Session::get('admin');
         $previousId = $previous && !empty($previous['id']) ? (int)$previous['id'] : 0;
+        if (!$previousId) {
+            $previousId = (int)$info['from_admin'];
+        }
         if ($previousId && $previousId != $admin['id']) {
             Session::set('impersonate_back', $previousId);
         }

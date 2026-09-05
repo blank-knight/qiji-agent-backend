@@ -458,12 +458,20 @@ class Query
                     $key2   = $fields ? array_shift($fields) : '';
                     $key    = $key ?: $key1;
                     foreach ($resultSet as $val) {
+                        // PHP8.1+ 弃用警告源头：结果集里混入非数组行（false 等），跳过
+                        if (!is_array($val)) {
+                            continue;
+                        }
+                        $k = $val[$key];
+                        if ($k === false || $k === null) {
+                            continue;
+                        }
                         if ($count > 2) {
-                            $result[$val[$key]] = $val;
+                            $result[$k] = $val;
                         } elseif (2 == $count) {
-                            $result[$val[$key]] = $val[$key2];
+                            $result[$k] = is_array($val) ? ($val[$key2] ?? null) : null;
                         } elseif (1 == $count) {
-                            $result[$val[$key]] = $val[$key1];
+                            $result[$k] = is_array($val) ? ($val[$key1] ?? null) : null;
                         }
                     }
                 } else {

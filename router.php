@@ -11,6 +11,12 @@ if (preg_match('#/(admin|index)\.php#i', $uri)) {
     return;
 }
 
+// imp.php = 下级后台独立入口（隔离 session cookie）
+if (preg_match('#/imp\.php#i', $uri)) {
+    require __DIR__ . '/imp.php';
+    return;
+}
+
 // 静态资源扩展名列表（不含 html/htm，因为 .html 可能是 ThinkPHP URL 后缀）
 $staticExts = ['css','js','woff2','woff','ttf','eot','otf','png','jpg','jpeg','gif','svg','ico','map'];
 
