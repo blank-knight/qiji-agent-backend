@@ -170,6 +170,8 @@ class Plan extends Api
 
         // 订单号：日期+随机
         $orderNo = date('YmdHis') . mt_rand(1000, 9999);
+        // 实际收款方（agent_id；平台收款=0）——对账/感知用
+        $payeeAgentId = isset($payOwner['id']) ? (int)$payOwner['id'] : 0;
         $orderData = [
             'order_no'   => $orderNo,
             'user_id'    => (int)$user->id,
@@ -179,6 +181,7 @@ class Plan extends Api
             'score'      => (int)$plan['score'],
             'price'      => round((float)$plan['price'], 2),
             'status'     => 'pending',
+            'payee_agent_id' => $payeeAgentId,
             'createtime' => time(),
             'updatetime' => time(),
         ];

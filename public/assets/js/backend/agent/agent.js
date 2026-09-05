@@ -34,6 +34,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                         {field: 'user_count', title: '用户数', sortable: true},
                         {field: 'score', title: '积分/点数', operate: 'BETWEEN', sortable: true},
                         {field: 'allow_model_config', title: 'API配置', searchList: {1: '允许自行配置', 0: '使用上级API'}, formatter: Table.api.formatter.label},
+                        {field: 'epay_url', title: '收款', operate: false, formatter: function (v) { return v ? '<span class="label label-warning">自收款</span>' : '<span class="label label-default">平台代收</span>'; }},
                         {field: 'status', title: __('Status'), formatter: Table.api.formatter.status, searchList: {normal: __('Normal'), hidden: __('Hidden')}},
                         {field: 'createtime', title: '创建时间', formatter: Table.api.formatter.datetime, operate: 'RANGE', addclass: 'datetimerange', sortable: true},
                         {
