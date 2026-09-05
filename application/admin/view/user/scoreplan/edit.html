@@ -1,0 +1,52 @@
+<form id="edit-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+
+    <div class="form-group">
+        <label for="c-name" class="control-label col-xs-12 col-sm-2"><i style="color:red">*</i>套餐名称:</label>
+        <div class="col-xs-12 col-sm-6">
+            <input id="c-name" data-rule="required" class="form-control" name="row[name]" type="text" value="{$row.name}" placeholder="如：入门包 / 月度畅用包">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="c-score" class="control-label col-xs-12 col-sm-2"><i style="color:red">*</i>Token数量:</label>
+        <div class="col-xs-12 col-sm-6">
+            <input id="c-score" data-rule="required" class="form-control" name="row[score]" type="number" value="{$row.name}" placeholder="到账积分/点数">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="c-price" class="control-label col-xs-12 col-sm-2"><i style="color:red">*</i>价格(元):</label>
+        <div class="col-xs-12 col-sm-6">
+            <input id="c-price" data-rule="required" class="form-control" name="row[price]" type="number" step="0.01" value="{$row.name}" placeholder="如 9.90">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="c-weigh" class="control-label col-xs-12 col-sm-2">排序:</label>
+        <div class="col-xs-12 col-sm-6">
+            <input id="c-weigh" class="form-control" name="row[weigh]" type="number" value="{$row.weigh}" placeholder="数值越大越靠前">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="c-remark" class="control-label col-xs-12 col-sm-2">描述:</label>
+        <div class="col-xs-12 col-sm-6">
+            <input id="c-remark" class="form-control" name="row[remark]" type="text" value="{$row.name}" placeholder="客户端卡片上的副文案(可选)">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="c-status" class="control-label col-xs-12 col-sm-2">状态:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_radios('row[status]', ['normal'=>'上架', 'hidden'=>'下架'], $row['status'])}
+        </div>
+    </div>
+
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-primary btn-embossed disabled">{:__('OK')}</button>
+            <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+        </div>
+    </div>
+</form>

@@ -248,6 +248,10 @@ class Agent extends Backend
             }
         }
         $this->view->assign('canGrantModelConfig', $canGrantModelConfig);
+
+        // 在线收款配置：超管或直系上级可替下级配置
+        $canSetEpay = $canGrantModelConfig;
+        $this->view->assign('canSetEpay', $canSetEpay);
         return $this->view->fetch();
     }
 
@@ -268,6 +272,24 @@ class Agent extends Backend
             unset($params['type']);
             // 上级不可更改
             unset($params['agent_id']);
+
+            // 在线收款配置：仅超管/直系上级可改；密钥留空=不动已有
+            if (isset($params['epay_url']) || isset($params['epay_pid']) || isset($params['epay_key'])) {
+                $canSetEpay = false;
+                if ($this->isSuperAdmin()) {
+                    $canSetEpay = true;
+                } else {
+                    $currentAgent = $this->getCurrentAgent();
+                    if ($currentAgent && $currentAgent['id'] != $ids && strpos($row['path'], $currentAgent['path']) === 0) {
+                        $canSetEpay = true;
+                    }
+                }
+                if (!$canSetEpay) {
+                    unset($params['epay_url'], $params['epay_pid'], $params['epay_key']);
+                } elseif (isset($params['epay_key']) && $params['epay_key'] === '') {
+                    unset($params['epay_key']); // 密钥留空不覆盖
+                }
+            }
 
             // API配置三选一映射（含 allow_model_config 授权校验）
             $this->applyApiMode($params, $row);
@@ -306,6 +328,10 @@ class Agent extends Backend
             }
         }
         $this->view->assign('canGrantModelConfig', $canGrantModelConfig);
+
+        // 在线收款配置：超管或直系上级可替下级配置
+        $canSetEpay = $canGrantModelConfig;
+        $this->view->assign('canSetEpay', $canSetEpay);
 
         // API配置三选一回显：self 优先于 custom（都开时显示 self，custom 字段保留兜底）
         $apiMode = 'inherit';

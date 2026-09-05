@@ -33,6 +33,13 @@ Route::group('api/client/v1', function () {
     // 充值
     Route::post('recharge/redeem', 'api/client.Recharge/redeem');
 
+    // 套餐购买
+    Route::get('plan/index', 'api/client.Plan/index');
+    Route::post('plan/order', 'api/client.Plan/order');
+    Route::get('plan/status', 'api/client.Plan/status');
+    Route::get('plan/notify', 'api/client.Plan/notify');
+    Route::any('plan/return', 'api/client.Plan/orderreturn');
+
     // 更新检查
     Route::get('update/check', 'api/client.Update/check');
 });
