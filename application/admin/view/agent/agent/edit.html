@@ -59,35 +59,12 @@
             <div class="radio">
                 <label for="api-mode-inherit"><input type="radio" name="row[api_mode]" id="api-mode-inherit" value="inherit" {if $api_mode == 'inherit'}checked{/if}> 使用上级API Key（默认，无需配置）</label>
             </div>
-            <div class="radio">
-                <label for="api-mode-custom"><input type="radio" name="row[api_mode]" id="api-mode-custom" value="custom" {if $api_mode == 'custom'}checked{/if}> 由我指定 —— 替其配置API地址与密钥</label>
-            </div>
-            <div id="api-custom-fields" style="margin:0 0 10px 20px;{if $api_mode != 'custom'}display:none;{/if}">
-                <div class="form-group" style="margin-bottom:8px;">
-                    <label class="control-label col-xs-12 col-sm-3" style="text-align:left;">API地址:</label>
-                    <div class="col-xs-12 col-sm-8">
-                        <input class="form-control" name="row[base_url]" type="text" value="{$row.base_url}" placeholder="如 https://api.example.com/v1">
-                    </div>
-                </div>
-                <div class="form-group" style="margin-bottom:8px;">
-                    <label class="control-label col-xs-12 col-sm-3" style="text-align:left;">API Key:</label>
-                    <div class="col-xs-12 col-sm-8">
-                        <input class="form-control" name="row[api_key]" type="text" value="{$row.api_key_plain}" placeholder="留空使用系统默认Key">
-                    </div>
-                </div>
-                <div class="form-group" style="margin-bottom:0;">
-                    <label class="control-label col-xs-12 col-sm-3" style="text-align:left;">可用模型:</label>
-                    <div class="col-xs-12 col-sm-8">
-                        <input class="form-control" name="row[models]" type="text" value="{$row.models}" placeholder="逗号分隔，如 gpt-4o,gpt-4o-mini；留空不限制">
-                    </div>
-                </div>
-            </div>
             {if $canGrantModelConfig}
             <div class="radio">
                 <label for="api-mode-self"><input type="radio" name="row[api_mode]" id="api-mode-self" value="self" {if $api_mode == 'self'}checked{/if}> 允许其自行配置 —— 该{if $row.type == 'tiepai'}贴牌商及其代理{else}代理{/if}后台会出现「大模型配置」菜单，由其自填</label>
             </div>
             {/if}
-            <p style="margin-top:5px;font-size:12px;color:#888;">切到「允许其自行配置」时，此前由我指定的配置保留作兜底，其未自行配置前仍按兜底下发</p>
+            <p style="margin-top:5px;font-size:12px;color:#888;">开启后其后台出现「大模型配置」菜单；关闭则收回菜单并回落使用上级配置</p>
         </div>
     </div>
 
@@ -108,17 +85,3 @@
     </div>
 </form>
 
-<script>
-// API配置三选一：切「由我指定」展开三栏（原生JS，不依赖jQuery/无缓存问题）
-(function () {
-    function toggle() {
-        var v = document.querySelector('input[name="row[api_mode]"]:checked');
-        var box = document.getElementById('api-custom-fields');
-        if (box) box.style.display = (v && v.value === 'custom') ? '' : 'none';
-    }
-    document.addEventListener('change', function (e) {
-        if (e.target && e.target.name === 'row[api_mode]') toggle();
-    });
-    toggle();
-})();
-</script>

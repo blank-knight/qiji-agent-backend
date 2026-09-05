@@ -73,24 +73,13 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
         },
         add: function () {
             Controller.api.bindevent();
-            Controller.api.bindApiModeToggle();
         },
         edit: function () {
             Controller.api.bindevent();
-            Controller.api.bindApiModeToggle();
         },
         api: {
             bindevent: function () {
                 Form.api.bindevent($("form[role=form]"));
-            },
-            // API配置三选一：切到「由我指定」展开三栏
-            bindApiModeToggle: function () {
-                var toggle = function () {
-                    var v = $('input[name="row[api_mode]"]:checked').val();
-                    $('#api-custom-fields').toggle(v === 'custom');
-                };
-                $(document).on('change ifChecked', 'input[name="row[api_mode]"]', toggle);
-                toggle();
             }
         }
     };

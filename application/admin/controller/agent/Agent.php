@@ -153,38 +153,13 @@ class Agent extends Backend
             }
         }
 
-        if ($mode === 'custom') {
-            $params['is_custom_key'] = 1;
-            $params['allow_model_config'] = $existing ? ($existing['allow_model_config'] ? 1 : 0) : 0;
-            // api_key base64
-            if (isset($params['api_key']) && $params['api_key'] !== '') {
-                $params['api_key'] = base64_encode(trim($params['api_key']));
-            } else {
-                unset($params['api_key']); // 留空=不动已有
-            }
-            // models 归一化
-            $models = isset($params['models']) ? trim($params['models']) : '';
-            if ($models === '') {
-                unset($params['models']);
-            } else {
-                $list = preg_split('/[,，]/u', $models);
-                $list = array_filter(array_map(function ($m) {
-                    $m = trim($m);
-                    return preg_match('/^[\w.:-]{1,100}$/', $m) ? $m : '';
-                }, $list));
-                $list = array_values(array_unique($list));
-                if (count($list) > 50) {
-                    $list = array_slice($list, 0, 50);
-                }
-                $params['models'] = $list ? implode(',', $list) : '';
-            }
-        } elseif ($mode === 'self') {
+        if ($mode === 'self') {
             $params['allow_model_config'] = 1;
             $params['is_custom_key'] = $existing ? ($existing['is_custom_key'] ? 1 : 0) : 0;
-            // custom 字段保留兜底：不修改 base_url/api_key/models
+            // 历史代填字段保留（若上级曾通过自助页代配），其未自行配置前仍按此下发
             unset($params['base_url'], $params['api_key'], $params['models']);
         } else {
-            // inherit：回到默认——清自定义
+            // inherit：回到默认——清自定义与授权
             $params['is_custom_key'] = 0;
             $params['allow_model_config'] = 0;
             $params['base_url'] = '';
@@ -336,8 +311,6 @@ class Agent extends Backend
         $apiMode = 'inherit';
         if (!empty($row['allow_model_config'])) {
             $apiMode = 'self';
-        } elseif (!empty($row['is_custom_key'])) {
-            $apiMode = 'custom';
         }
         $this->view->assign('api_mode', $apiMode);
         // api_key 库里是 base64，表单回显明文
