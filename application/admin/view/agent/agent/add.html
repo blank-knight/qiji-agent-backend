@@ -104,15 +104,7 @@
             {/if}
         </div>
     </div>
-    <script>
-    $(function () {
-        function toggleFields() {
-            var v = $('input[name="row[api_mode]"]:checked').val();
-            $('#api-custom-fields').toggle(v === 'custom');
-        }
-        $('input[name="row[api_mode]"]').on('change ifChecked', toggleFields).each(toggleFields);
-    });
-    </script>
+
 
     <div class="form-group">
         <label class="control-label col-xs-12 col-sm-2">{:__('Status')}:</label>
@@ -129,6 +121,21 @@
         </div>
     </div>
 </form>
+
+<script>
+// API配置三选一：切「由我指定」展开三栏（原生JS，不依赖jQuery/无缓存问题）
+(function () {
+    function toggle() {
+        var v = document.querySelector('input[name="row[api_mode]"]:checked');
+        var box = document.getElementById('api-custom-fields');
+        if (box) box.style.display = (v && v.value === 'custom') ? '' : 'none';
+    }
+    document.addEventListener('change', function (e) {
+        if (e.target && e.target.name === 'row[api_mode]') toggle();
+    });
+    toggle();
+})();
+</script>
 
 <script>
 $(function(){
