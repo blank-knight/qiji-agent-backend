@@ -142,11 +142,12 @@ class Plan extends Api
             $this->error('该套餐不适用于你的账号');
         }
 
-        // 收款配置：沿祖先链最近已配置者
+        // 收款配置：沿祖先链就近查找——代理自己优先，逐级向上，平台兜底
+        // （与 index() 的 pay_enabled 判定顺序一致：自己配了钱进自己，不用上级的）
         $payOwner = null;
-        foreach (array_reverse($chain) as $aid) {
+        foreach ($chain as $aid) {
             if (!$aid) {
-                // 平台收款配置：站点配置
+                // 平台收款配置：站点配置（链尾兜底）
                 $siteEpay = [
                     'id' => 0,
                     'epay_url' => config('site.epay_url') ?: '',
@@ -155,6 +156,7 @@ class Plan extends Api
                 ];
                 if ($siteEpay['epay_url'] && $siteEpay['epay_pid'] && $siteEpay['epay_key']) {
                     $payOwner = $siteEpay;
+                    break;
                 }
                 continue;
             }
