@@ -98,6 +98,13 @@ class Apikey extends Api
             }
         }
 
+        // 平台是否允许平台用户自选模型（site 配置，默认允许；代理链 models 非空时强制限定）
+        $allowModelSelect = (int)(config('site.allow_model_select') ?? 1);
+        if (!empty($models)) {
+            // 代理限定了模型清单：允许选择，但仅限清单内（前端过滤）
+            $allowModelSelect = 1;
+        }
+
         $this->success('', [
             'is_custom_key'  => (int)$user->is_custom_key,
             'api_key'        => $apiKey,
@@ -106,6 +113,7 @@ class Apikey extends Api
             'key_source'     => $keySource,
             'key_source_name'=> $keySourceName,
             'can_customize'  => (int)$user->is_custom_key ? true : false,
+            'allow_model_select' => $allowModelSelect,
         ]);
     }
 
