@@ -34,7 +34,8 @@ function check_cors_request()
 {
     if (isset($_SERVER['HTTP_ORIGIN'])) {
         $info = parse_url($_SERVER['HTTP_ORIGIN']);
-        $domainArr = explode(',', config('fastadmin.cors_request_domain') ?: '');
+        // 白名单：fa_config 可配（fastadmin 组），默认允许本机/本站（桌面端 dev 模式 127.0.0.1:5174 联调用）
+        $domainArr = explode(',', config('fastadmin.cors_request_domain') ?: '127.0.0.1,localhost');
         $domainArr[] = request()->host(true);
         if (in_array("*", $domainArr) || (isset($info['host']) && in_array($info['host'], $domainArr))) {
             header("Access-Control-Allow-Origin: " . $_SERVER['HTTP_ORIGIN']);
