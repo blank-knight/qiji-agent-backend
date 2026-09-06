@@ -32,6 +32,8 @@ return [
     'root_namespace'       => [],
     // 扩展函数文件
     'extra_file_list'      => [THINK_PATH . 'helper' . EXT],
+    // extra 目录下需加载为 config('fastadmin.*') 的文件（CORS 白名单等）
+    'extra_config_list'    => ['database', 'validate', 'fastadmin'],
     // 默认输出类型
     'default_return_type'  => 'html',
     // 默认AJAX数据返回格式,可选json xml ...
